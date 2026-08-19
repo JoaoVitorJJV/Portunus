@@ -1,0 +1,234 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Portunus.App.ViewModels.Auth"
+             xmlns:i="using:Projektanker.Icons.Avalonia"
+             x:Class="Portunus.App.Views.Auth.AuthView"
+             x:DataType="vm:AuthViewModel"
+             FontFamily="{DynamicResource InterFont}"
+             Background="{DynamicResource BgBrush}">
+
+  <Design.DataContext><vm:AuthViewModel/></Design.DataContext>
+
+  <Grid>
+    <!-- Glow -->
+    <Border Width="560" Height="360" Margin="0,-90,0,0"
+            HorizontalAlignment="Center" VerticalAlignment="Top" IsHitTestVisible="False">
+      <Border.Background>
+        <RadialGradientBrush Center="50%,0%" GradientOrigin="50%,0%" RadiusX="50%" RadiusY="60%">
+          <GradientStop Color="{DynamicResource GlowColor}" Offset="0"/>
+          <GradientStop Color="Transparent" Offset="0.75"/>
+        </RadialGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <!-- ================= BOAS-VINDAS ================= -->
+    <ScrollViewer IsVisible="{Binding IsWelcome}" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Width="380" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,24">
+        <Border Classes="seal" HorizontalAlignment="Center" Margin="0,0,0,16">
+          <Viewbox Width="30" Height="30">
+            <Canvas Width="24" Height="24">
+              <Path Data="M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z" Fill="White" Opacity="0.95"/>
+              <Path Data="M12 8.5 V12 M12 12 a1.6 1.6 0 1 0 0 3.2 a1.6 1.6 0 1 0 0 -3.2 Z"
+                    Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6"/>
+            </Canvas>
+          </Viewbox>
+        </Border>
+        <TextBlock Classes="wm" Text="Bem-vindo ao Portune" HorizontalAlignment="Center"/>
+        <TextBlock Classes="sub" Margin="0,6,0,0" TextWrapping="Wrap" TextAlignment="Center">
+          <Run Text="Crie seu cofre local. "/><Run Text="Nada sai deste dispositivo." FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/>
+        </TextBlock>
+
+        <StackPanel Spacing="11" Margin="0,26,0,0">
+          <TextBlock Classes="lbl" Text="NOME DO COFRE (OPCIONAL)"/>
+          <Border Classes="field">
+            <DockPanel>
+              <i:Icon Value="fa-solid fa-house" FontSize="17" DockPanel.Dock="Left" Margin="0,0,10,0"
+                      VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+              <TextBox Classes="bare" Text="{Binding VaultName}" Watermark="Pessoal"/>
+            </DockPanel>
+          </Border>
+
+          <TextBlock Classes="lbl" Text="SENHA-MESTRA"/>
+          <Border Classes="field">
+            <DockPanel>
+              <i:Icon Value="fa-solid fa-lock" FontSize="17" DockPanel.Dock="Left" Margin="0,0,10,0"
+                      VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+              <Button Classes="iconbtn" DockPanel.Dock="Right" Command="{Binding ToggleRevealCommand}">
+                <i:Icon Value="fa-solid fa-eye" FontSize="16" Foreground="{DynamicResource TextFaintBrush}"/>
+              </Button>
+              <TextBox Classes="bare mono" Text="{Binding Password}"
+                       PasswordChar="●" RevealPassword="{Binding IsRevealed}" Watermark="••••••••••"/>
+            </DockPanel>
+          </Border>
+
+          <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasPassword}">
+            <Grid Width="30" Height="30">
+              <Ellipse Width="26" Height="26" Stroke="{DynamicResource RingTrackBrush}" StrokeThickness="4"/>
+              <Ellipse Width="26" Height="26" Stroke="{DynamicResource BrassBrush}" StrokeThickness="4"
+                       StrokeLineCap="Round" StrokeDashArray="15.3,5.1">
+                <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+              </Ellipse>
+            </Grid>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{Binding StrengthLabel}" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource BrassBrush}"/>
+              <TextBlock Text="quanto mais longa e variada, melhor" FontSize="11" Foreground="{DynamicResource TextFaintBrush}"/>
+            </StackPanel>
+          </StackPanel>
+
+          <TextBlock Classes="lbl" Text="CONFIRMAR SENHA-MESTRA"/>
+          <Border Classes="field">
+            <DockPanel>
+              <i:Icon Value="fa-solid fa-lock" FontSize="17" DockPanel.Dock="Left" Margin="0,0,10,0"
+                      VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+              <TextBox Classes="bare mono" Text="{Binding PasswordConfirm}"
+                       PasswordChar="●" RevealPassword="{Binding IsRevealed}" Watermark="••••••••••"/>
+            </DockPanel>
+          </Border>
+
+          <Border Classes="note" Margin="0,12,0,0" Background="{DynamicResource Surface2Brush}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <i:Icon Value="fa-solid fa-triangle-exclamation" FontSize="16" VerticalAlignment="Top" Foreground="{DynamicResource WarnBrush}"/>
+              <TextBlock TextWrapping="Wrap" MaxWidth="300" FontSize="11.5" Foreground="{DynamicResource TextDimBrush}">
+                <Run Text="Não há recuperação." FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/><Run Text=" Se você esquecer a senha-mestra, o cofre não poderá ser aberto — nem por nós. Guarde-a com segurança."/>
+              </TextBlock>
+            </StackPanel>
+          </Border>
+
+          <CheckBox IsChecked="{Binding Acknowledged}" Margin="0,4,0,0">
+            <TextBlock TextWrapping="Wrap" MaxWidth="320" FontSize="12" Foreground="{DynamicResource TextDimBrush}"
+                       Text="Entendo que a senha-mestra não pode ser recuperada e a guardei em local seguro."/>
+          </CheckBox>
+
+          <Button Classes="primary" Margin="0,6,0,0" IsEnabled="{Binding CanCreate}" Command="{Binding CreateCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Criar cofre" VerticalAlignment="Center"/>
+              <i:Icon Value="fa-solid fa-arrow-right" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
+            </StackPanel>
+          </Button>
+
+          <TextBlock HorizontalAlignment="Center" FontSize="12.5" Margin="0,10,0,0"
+                     Foreground="{DynamicResource TextDimBrush}" Text="Já tem um cofre? Importar arquivo .vault"/>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- ================= SENHA-MESTRA ================= -->
+    <StackPanel Width="380" IsVisible="{Binding IsMaster}" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Border Classes="seal" HorizontalAlignment="Center" Margin="0,0,0,16">
+        <Viewbox Width="30" Height="30">
+          <Canvas Width="24" Height="24">
+            <Path Data="M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z" Fill="White" Opacity="0.95"/>
+            <Path Data="M12 8.5 V12 M12 12 a1.6 1.6 0 1 0 0 3.2 a1.6 1.6 0 1 0 0 -3.2 Z"
+                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6"/>
+          </Canvas>
+        </Viewbox>
+      </Border>
+      <TextBlock Classes="wm" Text="Portune" HorizontalAlignment="Center"/>
+      <TextBlock Classes="sub" Margin="0,6,0,0">
+        <Run Text="Cofre "/><Run Text="Pessoal" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/><Run Text=" · destravar"/>
+      </TextBlock>
+
+      <StackPanel Spacing="11" Margin="0,26,0,0">
+        <TextBlock Classes="lbl" Text="SENHA-MESTRA"/>
+        <Border Classes="field">
+          <DockPanel>
+            <i:Icon Value="fa-solid fa-lock" FontSize="17" DockPanel.Dock="Left" Margin="0,0,10,0"
+                    VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+            <Button Classes="iconbtn" DockPanel.Dock="Right" Command="{Binding ToggleRevealCommand}">
+              <i:Icon Value="fa-solid fa-eye" FontSize="16" Foreground="{DynamicResource TextFaintBrush}"/>
+            </Button>
+            <TextBox Classes="bare mono" Text="{Binding MasterPassword}"
+                     PasswordChar="●" RevealPassword="{Binding IsRevealed}" Watermark="Digite sua senha-mestra"/>
+          </DockPanel>
+        </Border>
+
+        <TextBlock IsVisible="{Binding HasError}" FontSize="12.5" FontWeight="SemiBold"
+                   Foreground="{DynamicResource BadBrush}" Text="Senha incorreta. Tente novamente."/>
+
+        <Button Classes="primary" IsEnabled="{Binding CanUnlock}" Command="{Binding UnlockCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Destravar" VerticalAlignment="Center"/>
+            <i:Icon Value="fa-solid fa-lock-open" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
+          </StackPanel>
+        </Button>
+
+        <Button Classes="ghost" Command="{Binding ShowPinCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <i:Icon Value="fa-solid fa-lock" FontSize="15" Foreground="{DynamicResource TextDimBrush}"/>
+            <TextBlock Text="Usar PIN deste dispositivo" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
+        <Border Classes="note" Margin="0,6,0,0">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <i:Icon Value="fa-solid fa-shield-halved" FontSize="16" VerticalAlignment="Top" Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock TextWrapping="Wrap" MaxWidth="300" FontSize="11.5" Foreground="{DynamicResource TextDimBrush}"
+                       Text="Sua senha-mestra é processada só neste dispositivo e nunca é armazenada."/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- ================= PIN ================= -->
+    <StackPanel Width="380" IsVisible="{Binding IsPin}" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <Border Classes="seal" HorizontalAlignment="Center" Margin="0,0,0,16">
+        <Viewbox Width="30" Height="30">
+          <Canvas Width="24" Height="24">
+            <Path Data="M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z" Fill="White" Opacity="0.95"/>
+            <Path Data="M12 8.5 V12 M12 12 a1.6 1.6 0 1 0 0 3.2 a1.6 1.6 0 1 0 0 -3.2 Z"
+                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6"/>
+          </Canvas>
+        </Viewbox>
+      </Border>
+      <TextBlock Classes="wm" Text="Portune" HorizontalAlignment="Center"/>
+      <TextBlock Classes="sub" Margin="0,6,0,20">
+        <Run Text="Cofre "/><Run Text="Pessoal" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/><Run Text=" · digite seu PIN"/>
+      </TextBlock>
+
+      <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center" Margin="0,0,0,20">
+        <Ellipse Width="14" Height="14" Fill="{DynamicResource AccentBrush}"/>
+        <Ellipse Width="14" Height="14" Fill="{DynamicResource AccentBrush}"/>
+        <Ellipse Width="14" Height="14" Stroke="{DynamicResource BorderBrush2}" StrokeThickness="2"/>
+        <Ellipse Width="14" Height="14" Stroke="{DynamicResource BorderBrush2}" StrokeThickness="2"/>
+        <Ellipse Width="14" Height="14" Stroke="{DynamicResource BorderBrush2}" StrokeThickness="2"/>
+        <Ellipse Width="14" Height="14" Stroke="{DynamicResource BorderBrush2}" StrokeThickness="2"/>
+      </StackPanel>
+
+      <UniformGrid Columns="3" Rows="4" HorizontalAlignment="Center" Width="240">
+        <Button Classes="pin" Content="1" Command="{Binding PinPressCommand}" CommandParameter="1"/>
+        <Button Classes="pin" Content="2" Command="{Binding PinPressCommand}" CommandParameter="2"/>
+        <Button Classes="pin" Content="3" Command="{Binding PinPressCommand}" CommandParameter="3"/>
+        <Button Classes="pin" Content="4" Command="{Binding PinPressCommand}" CommandParameter="4"/>
+        <Button Classes="pin" Content="5" Command="{Binding PinPressCommand}" CommandParameter="5"/>
+        <Button Classes="pin" Content="6" Command="{Binding PinPressCommand}" CommandParameter="6"/>
+        <Button Classes="pin" Content="7" Command="{Binding PinPressCommand}" CommandParameter="7"/>
+        <Button Classes="pin" Content="8" Command="{Binding PinPressCommand}" CommandParameter="8"/>
+        <Button Classes="pin" Content="9" Command="{Binding PinPressCommand}" CommandParameter="9"/>
+        <Button Classes="pin fn" Command="{Binding BiometricCommand}">
+          <i:Icon Value="fa-solid fa-fingerprint" FontSize="22"/>
+        </Button>
+        <Button Classes="pin" Content="0" Command="{Binding PinPressCommand}" CommandParameter="0"/>
+        <Button Classes="pin fn" Command="{Binding PinDeleteCommand}">
+          <i:Icon Value="fa-solid fa-delete-left" FontSize="20"/>
+        </Button>
+      </UniformGrid>
+
+      <TextBlock HorizontalAlignment="Center" Margin="0,16,0,0" FontSize="12"
+                 Foreground="{DynamicResource TextFaintBrush}" Text="3 tentativas antes de exigir a senha-mestra"/>
+      <Button Classes="ghost" BorderThickness="0" Height="30" Margin="0,8,0,0" Command="{Binding ShowMasterCommand}">
+        <TextBlock Text="Usar senha-mestra" Foreground="{DynamicResource AccentBrush}"/>
+      </Button>
+    </StackPanel>
+
+    <!-- DEV: alternador — REMOVER na produção -->
+    
+    <!--<Border Classes="seg" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20">
+      <StackPanel Orientation="Horizontal" Spacing="2">
+        <Button Classes="seg on" Content="Boas-vindas" Command="{Binding ShowWelcomeCommand}"/>
+        <Button Classes="seg" Content="Senha-mestra" Command="{Binding ShowMasterCommand}"/>
+        <Button Classes="seg" Content="PIN" Command="{Binding ShowPinCommand}"/>
+      </StackPanel>
+    </Border> -->
+   
+  </Grid>
+</UserControl>

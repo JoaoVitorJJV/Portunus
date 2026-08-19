@@ -1,0 +1,175 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<Styles.Resources>
+		<!-- Geometrias de ícone (grade 24×24, mesmas do mockup) -->
+		<StreamGeometry x:Key="IconSeal">M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z</StreamGeometry>
+		<StreamGeometry x:Key="IconLock">M6 10h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z M8 10V7a4 4 0 0 1 8 0v3</StreamGeometry>
+		<StreamGeometry x:Key="IconHouse">M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9z</StreamGeometry>
+		<StreamGeometry x:Key="IconEye">M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z</StreamGeometry>
+		<StreamGeometry x:Key="IconShieldCheck">M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z M9 12l2 2 4-4</StreamGeometry>
+		<StreamGeometry x:Key="IconAlert">M10.3 3.9l-8 13.9A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.2l-8-13.9a2 2 0 0 0-3.4 0z M12 9v4 M12 17h0.01</StreamGeometry>
+		<StreamGeometry x:Key="IconCheck">M20 6L9 17l-5-5</StreamGeometry>
+		<StreamGeometry x:Key="IconArrow">M5 12h14M13 6l6 6-6 6</StreamGeometry>
+	</Styles.Resources>
+
+	<!-- ===== Tipografia utilitária ===== -->
+	<Style Selector="TextBlock.wm">
+		<Setter Property="FontFamily" Value="{DynamicResource SerifFont}"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="FontSize" Value="30"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+	</Style>
+	<Style Selector="TextBlock.sub">
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextDimBrush}"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+		<Setter Property="TextAlignment" Value="Center"/>
+	</Style>
+	<Style Selector="TextBlock.lbl">
+		<Setter Property="FontSize" Value="11"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
+		<Setter Property="LetterSpacing" Value="0.4"/>
+	</Style>
+
+	<!-- ===== Selo (logo) ===== -->
+	<Style Selector="Border.seal">
+		<Setter Property="Width" Value="60"/>
+		<Setter Property="Height" Value="60"/>
+		<Setter Property="CornerRadius" Value="17"/>
+		<Setter Property="Background" Value="{DynamicResource SealBrush}"/>
+	</Style>
+
+	<!-- ===== Campo de entrada (.inp) ===== -->
+	<Style Selector="Border.field">
+		<Setter Property="Height" Value="46"/>
+		<Setter Property="CornerRadius" Value="12"/>
+		<Setter Property="Padding" Value="14,0"/>
+		<Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
+	<Style Selector="Border.field:focus-within">
+		<Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+	</Style>
+	<!-- TextBox "pelado" pra sentar dentro do Border.field -->
+	<Style Selector="TextBox.bare">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="MinHeight" Value="0"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+		<Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}"/>
+	</Style>
+	<Style Selector="TextBox.bare:focus /template/ Border#PART_BorderElement">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+	</Style>
+
+	<!-- ===== Botão primário (.btn) ===== -->
+	<Style Selector="Button.primary">
+		<Setter Property="Height" Value="46"/>
+		<Setter Property="CornerRadius" Value="12"/>
+		<Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+		<Setter Property="Foreground" Value="{DynamicResource AccentInkBrush}"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+	</Style>
+	<Style Selector="Button.primary:disabled /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+		<Setter Property="Opacity" Value="0.45"/>
+	</Style>
+
+	<!-- ===== Botão fantasma (.btn.ghost) ===== -->
+	<Style Selector="Button.ghost">
+		<Setter Property="Height" Value="46"/>
+		<Setter Property="CornerRadius" Value="12"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextDimBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="HorizontalAlignment" Value="Stretch"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<Style Selector="Button.ghost:pointerover /template/ ContentPresenter">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="TextElement.Foreground" Value="{DynamicResource AccentBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+	</Style>
+
+	<!-- ===== Ícone-botão (olho, etc.) ===== -->
+	<Style Selector="Button.iconbtn">
+		<Setter Property="Width" Value="30"/>
+		<Setter Property="Height" Value="30"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<Style Selector="Button.iconbtn:pointerover /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource Surface2Brush}"/>
+	</Style>
+
+	<!-- ===== Teclado do PIN ===== -->
+	<Style Selector="Button.pin">
+		<Setter Property="Width" Value="72"/>
+		<Setter Property="Height" Value="60"/>
+		<Setter Property="CornerRadius" Value="14"/>
+		<Setter Property="FontSize" Value="22"/>
+		<Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource BorderSoftBrush}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<Style Selector="Button.pin:pointerover /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}"/>
+	</Style>
+	<Style Selector="Button.pin.fn">
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextFaintBrush}"/>
+	</Style>
+
+	<!-- ===== Segmento (dev switcher) ===== -->
+	<Style Selector="Border.seg">
+		<Setter Property="CornerRadius" Value="9"/>
+		<Setter Property="Padding" Value="2"/>
+		<Setter Property="Background" Value="{DynamicResource Surface2Brush}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource BorderBrush2}"/>
+		<Setter Property="BorderThickness" Value="1"/>
+	</Style>
+	<Style Selector="Button.seg">
+		<Setter Property="Height" Value="26"/>
+		<Setter Property="Padding" Value="11,0"/>
+		<Setter Property="CornerRadius" Value="7"/>
+		<Setter Property="FontSize" Value="11"/>
+		<Setter Property="FontWeight" Value="SemiBold"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextDimBrush}"/>
+		<Setter Property="Cursor" Value="Hand"/>
+	</Style>
+	<Style Selector="Button.seg.on">
+		<Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+	</Style>
+
+	<!-- ===== Caixas de aviso (.note / .note.warn) ===== -->
+	<Style Selector="Border.note">
+		<Setter Property="CornerRadius" Value="11"/>
+		<Setter Property="Padding" Value="13,11"/>
+		<Setter Property="Background" Value="{DynamicResource Surface2Brush}"/>
+	</Style>
+</Styles>

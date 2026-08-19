@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="Portunus.App/Portunus.App.csproj" />
+    <Project Path="Portunus.Core/Portunus.Core.csproj" />
+    <Project Path="Portunus.Platform/Portunus.Platform.csproj" Id="c69ea8f3-ec08-4177-b690-7751945c3c95" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Portunus.Core.Tests/Portunus.Core.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auth="using:Portunus.App.Views.Auth"
+        xmlns:vma="using:Portunus.App.ViewModels.Auth"
+        x:Class="Portunus.App.Views.MainWindow"
+        Width="1120" Height="720"
+        Title="Portune">
+
+  <auth:AuthView>
+    <auth:AuthView.DataContext>
+      <vma:AuthViewModel/>
+    </auth:AuthView.DataContext>
+  </auth:AuthView>
+
+</Window>

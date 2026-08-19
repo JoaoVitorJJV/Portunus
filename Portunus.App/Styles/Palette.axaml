@@ -1,0 +1,86 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Fontes: troque pelo formato avares:// quando empacotar os .ttf em Assets/Fonts -->
+<FontFamily x:Key="InterFont">avares://Portunus.App/Assets/Fonts/Inter/static/Inter_18pt-Regular.ttf#Inter 18pt</FontFamily>
+<FontFamily x:Key="SerifFont">avares://Portunus.App/Assets/Fonts/Fraunces/static/Fraunces_72pt-Bold.ttf#Fraunces 72pt</FontFamily>
+<FontFamily x:Key="MonoFont">avares://Portunus.App/Assets/Fonts/JetBrains_Mono/static/JetBrainsMono-Regular.ttf#JetBrains Mono</FontFamily>
+
+  <ResourceDictionary.ThemeDictionaries>
+    <!-- ===== SÁLVIA (claro) ===== -->
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="BgColor">#f5f7f6</Color>
+      <Color x:Key="Bg2Color">#fbfcfb</Color>
+      <Color x:Key="SurfaceColor">#ffffff</Color>
+      <Color x:Key="Surface2Color">#eef2f0</Color>
+      <Color x:Key="SurfaceHoverColor">#e4ebe7</Color>
+      <Color x:Key="BorderColor">#e0e6e2</Color>
+      <Color x:Key="BorderSoftColor">#ebefed</Color>
+      <Color x:Key="TextColor">#14201b</Color>
+      <Color x:Key="TextDimColor">#5b6a62</Color>
+      <Color x:Key="TextFaintColor">#93a099</Color>
+      <Color x:Key="AccentColor">#157a5b</Color>
+      <Color x:Key="AccentHoverColor">#1a8f6a</Color>
+      <Color x:Key="AccentSoftColor">#14157a5b</Color>
+      <Color x:Key="AccentInkColor">#ffffff</Color>
+      <Color x:Key="BrassColor">#a9803a</Color>
+      <Color x:Key="OkColor">#1f9d6b</Color>
+      <Color x:Key="WarnColor">#c48a2b</Color>
+      <Color x:Key="BadColor">#cf5a55</Color>
+      <Color x:Key="RingTrackColor">#e5eae7</Color>
+      <Color x:Key="GlowColor">#22157a5b</Color>
+      <Color x:Key="SealEndColor">#0d5a42</Color>
+    </ResourceDictionary>
+    <!-- ===== GRAFITE (escuro) ===== -->
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="BgColor">#13171a</Color>
+      <Color x:Key="Bg2Color">#171b1e</Color>
+      <Color x:Key="SurfaceColor">#1b2124</Color>
+      <Color x:Key="Surface2Color">#232a2d</Color>
+      <Color x:Key="SurfaceHoverColor">#2a3236</Color>
+      <Color x:Key="BorderColor">#2a3135</Color>
+      <Color x:Key="BorderSoftColor">#222a2d</Color>
+      <Color x:Key="TextColor">#e8edea</Color>
+      <Color x:Key="TextDimColor">#99a8a0</Color>
+      <Color x:Key="TextFaintColor">#6a7873</Color>
+      <Color x:Key="AccentColor">#3fb389</Color>
+      <Color x:Key="AccentHoverColor">#4cc496</Color>
+      <Color x:Key="AccentSoftColor">#203fb389</Color>
+      <Color x:Key="AccentInkColor">#06110c</Color>
+      <Color x:Key="BrassColor">#d0a765</Color>
+      <Color x:Key="OkColor">#4cc48d</Color>
+      <Color x:Key="WarnColor">#d9a24c</Color>
+      <Color x:Key="BadColor">#e0707f</Color>
+      <Color x:Key="RingTrackColor">#2a3236</Color>
+      <Color x:Key="GlowColor">#263fb389</Color>
+      <Color x:Key="SealEndColor">#0d5a42</Color>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <!-- Brushes: seguem a cor do tema ativo automaticamente -->
+  <SolidColorBrush x:Key="BgBrush"           Color="{DynamicResource BgColor}"/>
+  <SolidColorBrush x:Key="Bg2Brush"          Color="{DynamicResource Bg2Color}"/>
+  <SolidColorBrush x:Key="SurfaceBrush"      Color="{DynamicResource SurfaceColor}"/>
+  <SolidColorBrush x:Key="Surface2Brush"     Color="{DynamicResource Surface2Color}"/>
+  <SolidColorBrush x:Key="SurfaceHoverBrush" Color="{DynamicResource SurfaceHoverColor}"/>
+  <SolidColorBrush x:Key="BorderBrush2"      Color="{DynamicResource BorderColor}"/>
+  <SolidColorBrush x:Key="BorderSoftBrush"   Color="{DynamicResource BorderSoftColor}"/>
+  <SolidColorBrush x:Key="TextBrush"         Color="{DynamicResource TextColor}"/>
+  <SolidColorBrush x:Key="TextDimBrush"      Color="{DynamicResource TextDimColor}"/>
+  <SolidColorBrush x:Key="TextFaintBrush"    Color="{DynamicResource TextFaintColor}"/>
+  <SolidColorBrush x:Key="AccentBrush"       Color="{DynamicResource AccentColor}"/>
+  <SolidColorBrush x:Key="AccentHoverBrush"  Color="{DynamicResource AccentHoverColor}"/>
+  <SolidColorBrush x:Key="AccentSoftBrush"   Color="{DynamicResource AccentSoftColor}"/>
+  <SolidColorBrush x:Key="AccentInkBrush"    Color="{DynamicResource AccentInkColor}"/>
+  <SolidColorBrush x:Key="BrassBrush"        Color="{DynamicResource BrassColor}"/>
+  <SolidColorBrush x:Key="OkBrush"           Color="{DynamicResource OkColor}"/>
+  <SolidColorBrush x:Key="WarnBrush"         Color="{DynamicResource WarnColor}"/>
+  <SolidColorBrush x:Key="BadBrush"          Color="{DynamicResource BadColor}"/>
+  <SolidColorBrush x:Key="RingTrackBrush"    Color="{DynamicResource RingTrackColor}"/>
+
+  <!-- Gradiente do selo (usa a cor de acento do tema) -->
+  <LinearGradientBrush x:Key="SealBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+    <GradientStop Color="{DynamicResource AccentColor}"  Offset="0"/>
+    <GradientStop Color="{DynamicResource SealEndColor}" Offset="1"/>
+  </LinearGradientBrush>
+</ResourceDictionary>
