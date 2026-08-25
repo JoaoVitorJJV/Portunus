@@ -13,12 +13,11 @@ on:
         options: [windows, macos, both]
         default: windows
 
-# Necessário para o vpk criar a tag e o release usando o GITHUB_TOKEN.
 permissions:
   contents: write
 
 env:
-  VPK_VERSION: "1.2.0"                 # manter igual ao pacote Velopack do app
+  VPK_VERSION: "1.2.0"
   PACK_ID:     "Portunus"
   APP_TITLE:   "Portunus"
   MAIN_EXE:    "Portunus.App.exe"
@@ -26,7 +25,6 @@ env:
   APP_PROJ:    "Portunus.App/Portunus.App.csproj"
   ASSETS:      "Portunus.App/Assets"
 
-# bash em todos os jobs -> o cálculo de versão é idêntico no Windows e no Mac.
 defaults:
   run:
     shell: bash
@@ -52,17 +50,19 @@ jobs:
         id: v
         run: |
           BASE=$(cat version.txt | tr -d '[:space:]')
+          MAJOR_MINOR=$(echo "$BASE" | cut -d'.' -f1,2)
           RUN="${{ github.run_number }}"
-          # Ponto antes do número -> comparado como número (build.10 > build.9).
+
           if [ "${{ github.ref_name }}" = "master" ]; then
             PACK="$BASE-build.$RUN";       CH="win";       PRE="false"
           else
             PACK="$BASE-build-alpha.$RUN"; CH="win-alpha"; PRE="true"
           fi
+
           {
-            echo "pack=$PACK"     # semver2 -> --packVersion / -p:Version / tag / nome
-            echo "msi=$BASE.$RUN" # 4 partes numéricas -> --msiVersion (exigência do MSI)
-            echo "asm=$BASE.0"    # AssemblyVersion (estável por base)
+            echo "pack=$PACK"
+            echo "msi=$MAJOR_MINOR.$RUN.0"   # ex: 0.1.42.0 - quarto segmento sempre 0 (exigência do MSI)
+            echo "asm=$BASE.0"               # ex: 0.1.0.0  - AssemblyVersion estável por base
             echo "channel=$CH"
             echo "pre=$PRE"
             echo "tag=v$PACK"
@@ -77,8 +77,8 @@ jobs:
           -p:AssemblyVersion=${{ steps.v.outputs.asm }}
           -o ./publish
 
-      # Baixa o release anterior desse canal para o Velopack montar o delta.
-      # No primeiro build do canal ainda não existe nada -> ignora o erro.
+      # Baixa o release anterior para o Velopack montar o pacote delta.
+      # No primeiro build do canal não existe nada -> ignora o erro.
       - name: Baixar release anterior (deltas)
         continue-on-error: true
         run: >
@@ -104,8 +104,9 @@ jobs:
           --msiVersion ${{ steps.v.outputs.msi }}
           --msiBanner "$ASSETS/msi-banner.bmp"
           --msiLogo "$ASSETS/msi-logo.bmp"
+          --instLocation PerUser
 
-      - name: Upload -> cria a tag e o release com os artefatos
+      - name: Upload - cria tag e release com artefatos
         run: >
           vpk upload github
           --repoUrl "https://github.com/${{ github.repository }}"
@@ -137,11 +138,13 @@ jobs:
         run: |
           BASE=$(cat version.txt | tr -d '[:space:]')
           RUN="${{ github.run_number }}"
+
           if [ "${{ github.ref_name }}" = "master" ]; then
             PACK="$BASE-build.$RUN";       CH="osx";       PRE="false"
           else
             PACK="$BASE-build-alpha.$RUN"; CH="osx-alpha"; PRE="true"
           fi
+
           {
             echo "pack=$PACK"
             echo "asm=$BASE.0"
@@ -166,8 +169,6 @@ jobs:
           --channel ${{ steps.v.outputs.channel }}
           --token "${{ secrets.GITHUB_TOKEN }}"
 
-      # No mac o instalador é .pkg (wizard nativo). Sem splash/MSI.
-      # --icon precisa ser .icns para o Velopack montar o bundle .app.
       - name: Pack (.pkg)
         run: >
           vpk pack
@@ -179,7 +180,7 @@ jobs:
           --packAuthors "$AUTHORS"
           --icon "$ASSETS/Icons/export/portune-icon.icns"
 
-      - name: Upload -> cria a tag e o release com os artefatos
+      - name: Upload — cria tag e release com artefatos
         run: >
           vpk upload github
           --repoUrl "https://github.com/${{ github.repository }}"
