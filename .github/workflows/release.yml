@@ -1,0 +1,191 @@
+name: Release
+
+# Só roda quando VOCÊ mandar (Actions -> Release -> Run workflow).
+# Na hora de rodar, escolha a branch:
+#   master    -> produção      (0.1.0-build.42)
+#   developer -> homologação   (0.1.0-build-alpha.42)
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Plataformas para gerar (mac gasta 10x os minutos)"
+        type: choice
+        options: [windows, macos, both]
+        default: windows
+
+# Necessário para o vpk criar a tag e o release usando o GITHUB_TOKEN.
+permissions:
+  contents: write
+
+env:
+  VPK_VERSION: "1.2.0"                 # manter igual ao pacote Velopack do app
+  PACK_ID:     "Portunus"
+  APP_TITLE:   "Portunus"
+  MAIN_EXE:    "Portunus.App.exe"
+  AUTHORS:     "PortunusCompany"
+  APP_PROJ:    "Portunus.App/Portunus.App.csproj"
+  ASSETS:      "Portunus.App/Assets"
+
+# bash em todos os jobs -> o cálculo de versão é idêntico no Windows e no Mac.
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ============================ WINDOWS ============================
+  build-windows:
+    if: ${{ inputs.target == 'windows' || inputs.target == 'both' }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Instalar vpk
+        run: |
+          dotnet tool install -g vpk --version "$VPK_VERSION"
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      - name: Calcular versão
+        id: v
+        run: |
+          BASE=$(cat version.txt | tr -d '[:space:]')
+          RUN="${{ github.run_number }}"
+          # Ponto antes do número -> comparado como número (build.10 > build.9).
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            PACK="$BASE-build.$RUN";       CH="win";       PRE="false"
+          else
+            PACK="$BASE-build-alpha.$RUN"; CH="win-alpha"; PRE="true"
+          fi
+          {
+            echo "pack=$PACK"     # semver2 -> --packVersion / -p:Version / tag / nome
+            echo "msi=$BASE.$RUN" # 4 partes numéricas -> --msiVersion (exigência do MSI)
+            echo "asm=$BASE.0"    # AssemblyVersion (estável por base)
+            echo "channel=$CH"
+            echo "pre=$PRE"
+            echo "tag=v$PACK"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish
+        run: >
+          dotnet publish "$APP_PROJ"
+          -c Release -r win-x64 --self-contained true
+          -p:Version=${{ steps.v.outputs.pack }}
+          -p:FileVersion=${{ steps.v.outputs.msi }}
+          -p:AssemblyVersion=${{ steps.v.outputs.asm }}
+          -o ./publish
+
+      # Baixa o release anterior desse canal para o Velopack montar o delta.
+      # No primeiro build do canal ainda não existe nada -> ignora o erro.
+      - name: Baixar release anterior (deltas)
+        continue-on-error: true
+        run: >
+          vpk download github
+          --repoUrl "https://github.com/${{ github.repository }}"
+          --channel ${{ steps.v.outputs.channel }}
+          --token "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Pack (Setup.exe + MSI)
+        run: >
+          vpk pack
+          -u "$PACK_ID"
+          -v ${{ steps.v.outputs.pack }}
+          -p ./publish
+          -e "$MAIN_EXE"
+          --channel ${{ steps.v.outputs.channel }}
+          --packTitle "$APP_TITLE"
+          --packAuthors "$AUTHORS"
+          --icon "$ASSETS/Icons/export/portune-icon.ico"
+          --splashImage "$ASSETS/splash.png"
+          --splashProgressColor "#157a5b"
+          --msi
+          --msiVersion ${{ steps.v.outputs.msi }}
+          --msiBanner "$ASSETS/msi-banner.bmp"
+          --msiLogo "$ASSETS/msi-logo.bmp"
+
+      - name: Upload -> cria a tag e o release com os artefatos
+        run: >
+          vpk upload github
+          --repoUrl "https://github.com/${{ github.repository }}"
+          --channel ${{ steps.v.outputs.channel }}
+          --token "${{ secrets.GITHUB_TOKEN }}"
+          --publish --merge
+          ${{ steps.v.outputs.pre == 'true' && '--pre' || '' }}
+          --releaseName "Portunus ${{ steps.v.outputs.pack }}"
+          --tag ${{ steps.v.outputs.tag }}
+
+  # ============================= MACOS =============================
+  build-macos:
+    if: ${{ inputs.target == 'macos' || inputs.target == 'both' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Instalar vpk
+        run: |
+          dotnet tool install -g vpk --version "$VPK_VERSION"
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      - name: Calcular versão
+        id: v
+        run: |
+          BASE=$(cat version.txt | tr -d '[:space:]')
+          RUN="${{ github.run_number }}"
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            PACK="$BASE-build.$RUN";       CH="osx";       PRE="false"
+          else
+            PACK="$BASE-build-alpha.$RUN"; CH="osx-alpha"; PRE="true"
+          fi
+          {
+            echo "pack=$PACK"
+            echo "asm=$BASE.0"
+            echo "channel=$CH"
+            echo "pre=$PRE"
+            echo "tag=v$PACK"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish
+        run: >
+          dotnet publish "$APP_PROJ"
+          -c Release -r osx-arm64 --self-contained true
+          -p:Version=${{ steps.v.outputs.pack }}
+          -p:AssemblyVersion=${{ steps.v.outputs.asm }}
+          -o ./publish
+
+      - name: Baixar release anterior (deltas)
+        continue-on-error: true
+        run: >
+          vpk download github
+          --repoUrl "https://github.com/${{ github.repository }}"
+          --channel ${{ steps.v.outputs.channel }}
+          --token "${{ secrets.GITHUB_TOKEN }}"
+
+      # No mac o instalador é .pkg (wizard nativo). Sem splash/MSI.
+      # --icon precisa ser .icns para o Velopack montar o bundle .app.
+      - name: Pack (.pkg)
+        run: >
+          vpk pack
+          -u "$PACK_ID"
+          -v ${{ steps.v.outputs.pack }}
+          -p ./publish
+          --channel ${{ steps.v.outputs.channel }}
+          --packTitle "$APP_TITLE"
+          --packAuthors "$AUTHORS"
+          --icon "$ASSETS/Icons/export/portune-icon.icns"
+
+      - name: Upload -> cria a tag e o release com os artefatos
+        run: >
+          vpk upload github
+          --repoUrl "https://github.com/${{ github.repository }}"
+          --channel ${{ steps.v.outputs.channel }}
+          --token "${{ secrets.GITHUB_TOKEN }}"
+          --publish --merge
+          ${{ steps.v.outputs.pre == 'true' && '--pre' || '' }}
+          --releaseName "Portunus ${{ steps.v.outputs.pack }}"
+          --tag ${{ steps.v.outputs.tag }}
