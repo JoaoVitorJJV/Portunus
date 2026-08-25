@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Portunus.App.ViewModels.Dashboard"
+             x:Class="Portunus.App.Views.Dashboard.VaultEditorView"
+             xmlns:i="using:Projektanker.Icons.Avalonia"
+             x:DataType="vm:VaultEditorViewModel">
+  
+  <!-- Usando propriedades explícitas no lugar de 'modal-card' -->
+  <Border Background="{DynamicResource SurfaceBrush}"
+          BorderBrush="{DynamicResource BorderSoftBrush}"
+          BorderThickness="1"
+          CornerRadius="16"
+          Width="420"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          BoxShadow="0 10 40 0 #50000000"
+          ClipToBounds="True">
+          
+    <DockPanel>
+      <!-- HEADER -->
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="28,24,18,18">
+        <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+          <!-- Removida a classe 'wm' e formatado direto para evitar cortes -->
+          <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Text="Novo cofre"/>
+          <TextBlock FontSize="12.5" Foreground="{DynamicResource TextDimBrush}" Text="Crie um espaço separado para suas senhas." TextWrapping="Wrap"/>
+        </StackPanel>
+        <Button Grid.Column="1" Classes="iconbtn" VerticalAlignment="Center" Command="{Binding CancelCommand}">
+          <i:Icon Value="fa-solid fa-xmark" FontSize="16" Foreground="{DynamicResource TextFaintBrush}"/>
+        </Button>
+      </Grid>
+
+      <!-- FOOTER -->
+      <Border DockPanel.Dock="Bottom" Padding="28,15,28,22" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderSoftBrush}" Background="{DynamicResource Bg2Brush}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+          <Button Classes="ghost" MinWidth="120" Command="{Binding CancelCommand}">
+             <TextBlock Text="Cancelar" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Button>
+          <Button Classes="primary" MinWidth="152" Command="{Binding CreateCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Criar cofre" VerticalAlignment="Center"/>
+              <i:Icon Value="fa-solid fa-check" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <!-- BODY -->
+      <StackPanel Margin="28,10,28,30" Spacing="16">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="lbl" Text="NOME DO COFRE"/>
+          <Border Classes="field">
+            <TextBox Classes="bare" Text="{Binding Name}" Watermark="Ex: Trabalho, Pessoal..."/>
+          </Border>
+        </StackPanel>
+      </StackPanel>
+      
+    </DockPanel>
+  </Border>
+</UserControl>

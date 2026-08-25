@@ -8,7 +8,7 @@ namespace Portunus.Core.Models
         public Guid? CategoryId { get; set; }
         public List<Guid> TagIds { get; set; } = [];
         public List<RecoveryCodeEntry> RecoveryCodes { get; set; } = [];
-        public List<PasswordNote> Notes { get; set; } = [];
+        public string? Notes { get; set; }
         public required string Password { get; set; }
         public string? Username { get; set; }
         public required string Name { get; set; }
@@ -17,6 +17,8 @@ namespace Portunus.Core.Models
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public DateTime? DateUpdated { get; set; }
         public DateTime? DateToFavorited { get; set; }
+        public string FavColor { get; set; } = "#2e7d32";
+        public bool IsFavorite { get; set; }
         public string? Url { get; set; }
     }
 

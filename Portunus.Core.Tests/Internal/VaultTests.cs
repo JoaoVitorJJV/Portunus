@@ -1,4 +1,5 @@
-﻿using Portunus.Core.Models;
+﻿using Portunus.Core.DTO;
+using Portunus.Core.Models;
 using Portunus.Core.Vault;
 using System.Text.Json;
 
@@ -14,11 +15,12 @@ namespace Portunus.Core.Tests.Internal
             // Arrange
             string masterPassword = MasterPassword;
             string path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.vault");
+            CreateVaultDTO dto = new() { MasterPassword = masterPassword, VaultName = "Pessoal", Path = path };
 
             try
             {
                 // Act
-                using VaultSession vault = VaultSession.CreateNew(masterPassword, path);
+                using VaultSession vault = VaultSession.CreateNew(dto);
                 bool tryUnlock = VaultSession.TryUnlock(path, masterPassword, out VaultSession? vaultUnlocked);
 
 
@@ -45,10 +47,11 @@ namespace Portunus.Core.Tests.Internal
             string masterPassword = MasterPassword;
             string wrongPassword = "WrongPassword";
             string path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.vault");
+            CreateVaultDTO dto = new() { MasterPassword = masterPassword, VaultName = "Pessoal", Path = path };
             try
             {
                 // Act
-                using VaultSession vault = VaultSession.CreateNew(masterPassword, path);
+                using VaultSession vault = VaultSession.CreateNew(dto);
                 bool tryUnlock = VaultSession.TryUnlock(path, wrongPassword, out VaultSession? vaultUnlocked);
 
                 // Assert
@@ -239,8 +242,8 @@ namespace Portunus.Core.Tests.Internal
         #region Métodos Privados
         private void CreateNewVault(string? path)
         {
-            string masterPassword = MasterPassword;
-            using VaultSession vault = VaultSession.CreateNew(masterPassword, path);
+            CreateVaultDTO dto = new() { MasterPassword = MasterPassword, VaultName = "Pessoal", Path = path };
+            using VaultSession vault = VaultSession.CreateNew(dto);
 
         }
 
@@ -265,7 +268,7 @@ namespace Portunus.Core.Tests.Internal
                 CategoryId = categoryId,
                 TagIds = tagIds is null ? [] : [.. tagIds],
                 RecoveryCodes = [new() { Code = "Recovery Test 1..." }],
-                Notes = [new() { Content = "Notes 1..", Name = "Notes 1..." }],
+                Notes = "Notes 1..",
                 Username = "joao@gmail.com",
                 Password = "bananinha123",
                 Url = "url.com",

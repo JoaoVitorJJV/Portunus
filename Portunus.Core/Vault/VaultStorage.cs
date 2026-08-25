@@ -11,7 +11,16 @@
             File.Move(temp, path, overwrite: true);
         }
 
-        public static byte [] Load(string path) { return File.ReadAllBytes(path); }
+        public static byte[] Load(string path) { return File.ReadAllBytes(path); }
+
+        public static void DeleteVault(string path) {
+            if (File.Exists(path)) File.Delete(path);
+        }
+
+        public static void ImportVault(string importPath, string targetPath)
+        {
+            File.Copy(importPath, targetPath, overwrite: true);
+        }
     }
 
     public static class VaultLocation

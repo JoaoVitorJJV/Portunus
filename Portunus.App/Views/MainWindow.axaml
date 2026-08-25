@@ -1,15 +1,35 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:auth="using:Portunus.App.Views.Auth"
-        xmlns:vma="using:Portunus.App.ViewModels.Auth"
+        xmlns:vm="using:Portunus.App.ViewModels"
+        xmlns:i="using:Projektanker.Icons.Avalonia"
         x:Class="Portunus.App.Views.MainWindow"
-        Width="1120" Height="720"
-        Title="Portune">
+        Width="1200" Height="720"
+        Title="Portunus"
+        Icon="/Assets/Icons/export/portune-short-icon.ico">
 
-  <auth:AuthView>
-    <auth:AuthView.DataContext>
-      <vma:AuthViewModel/>
-    </auth:AuthView.DataContext>
-  </auth:AuthView>
+    <Grid>
+        <TransitioningContentControl Content="{Binding Navigation.CurrentPage}">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:0:0.35"/>
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
+
+        <!-- Toast -->
+        <Border Classes="toast" Classes.on="{Binding Notifications.IsVisible}">
+            <StackPanel Orientation="Horizontal" Spacing="11">
+            <i:Icon Value="fa-solid fa-check" FontSize="16" VerticalAlignment="Top"
+                    Foreground="{DynamicResource AccentBrush}"
+                    IsVisible="{Binding !Notifications.IsError}"/>
+            <i:Icon Value="fa-solid fa-circle-exclamation" FontSize="16" VerticalAlignment="Top"
+                    Foreground="{DynamicResource BadBrush}"
+                    IsVisible="{Binding Notifications.IsError}"/>
+            <StackPanel Spacing="2">
+                <TextBlock Classes="toast-title" Text="{Binding Notifications.Title}"/>
+                <TextBlock Classes="toast-msg" Text="{Binding Notifications.Message}"
+                            IsVisible="{Binding Notifications.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
 
 </Window>

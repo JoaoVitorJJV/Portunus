@@ -1,5 +1,6 @@
 ﻿using Portunus.Core.Crypto;
 using Portunus.Core.Crypto.DTO;
+using Portunus.Core.DTO;
 using Portunus.Core.Extensions;
 using Portunus.Core.Models;
 using System;
@@ -32,12 +33,12 @@ namespace Portunus.Core.Vault
             _key = key; _salt = salt; _parameters = parameters; _data = data; _path = path;
         }
 
-        public static VaultSession CreateNew(string masterPassword, string? path)
+        public static VaultSession CreateNew(CreateVaultDTO vaultData)
         {
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(masterPassword);
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(vaultData.MasterPassword);
             byte[] salt = KeyDerivation.GenerateSalt();
             Argon2Params parameters = Argon2Params.Default;
-            string pathLocation = path ?? VaultLocation.DefaultPath;
+            string pathLocation = vaultData.Path ?? VaultLocation.DefaultPath;
 
             byte[] key = KeyDerivation.DeriveKey(
                 passwordBytes, salt, parameters.Memory, parameters.Iterations, parameters.Parallelism);
@@ -158,7 +159,7 @@ namespace Portunus.Core.Vault
         public bool DeleteVault(Guid id)
         {
             EnsureUnlocked();
-            if (_data.Vaults.Count <= 1) return false;
+            //if (_data.Vaults.Count <= 1) return false;
 
             Mutate(d =>
             {

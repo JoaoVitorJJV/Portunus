@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="using:Projektanker.Icons.Avalonia"
+             xmlns:dashboard="using:Portunus.App.ViewModels.Dashboard"
+             x:Class="Portunus.App.Views.Dashboard.CategoryEditorView"
+             x:DataType="dashboard:CategoryEditorViewModel"
+             FontFamily="{DynamicResource InterFont}">
+
+  <Border Classes="modal-card" Width="480" RenderTransformOrigin="0.5,0.4">
+    <Border.RenderTransform>
+      <ScaleTransform/>
+    </Border.RenderTransform>
+    <Border.Styles>
+      <Style Selector="Border.modal-card">
+        <Style.Animations>
+          <Animation Duration="0:0:0.22" Easing="CubicEaseOut" FillMode="Forward">
+            <KeyFrame Cue="0%">
+              <Setter Property="Opacity" Value="0"/>
+              <Setter Property="ScaleTransform.ScaleX" Value="0.96"/>
+              <Setter Property="ScaleTransform.ScaleY" Value="0.96"/>
+            </KeyFrame>
+            <KeyFrame Cue="100%">
+              <Setter Property="Opacity" Value="1"/>
+              <Setter Property="ScaleTransform.ScaleX" Value="1"/>
+              <Setter Property="ScaleTransform.ScaleY" Value="1"/>
+            </KeyFrame>
+          </Animation>
+        </Style.Animations>
+      </Style>
+    </Border.Styles>
+
+    <DockPanel>
+
+      <!-- HEADER -->
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="28,24,18,18">
+        <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+          <TextBlock Classes="wm" FontSize="24" Text="Nova categoria"/>
+          <TextBlock FontSize="12.5" Foreground="{DynamicResource TextDimBrush}" Text="Organize seus itens com tags personalizadas."/>
+        </StackPanel>
+        <Button Grid.Column="1" Classes="iconbtn" VerticalAlignment="Center"
+                Command="{Binding CancelCommand}" ToolTip.Tip="Fechar">
+          <i:Icon Value="fa-solid fa-xmark" FontSize="16" Foreground="{DynamicResource TextFaintBrush}"/>
+        </Button>
+      </Grid>
+
+      <!-- FOOTER -->
+      <Border DockPanel.Dock="Bottom" Padding="28,15,28,22"
+              BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BorderSoftBrush}"
+              Background="{DynamicResource Bg2Brush}">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+          <Button Classes="ghost" MinWidth="120" Command="{Binding CancelCommand}">
+             <TextBlock Text="Cancelar" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Button>
+          <Button Classes="primary" MinWidth="152" Command="{Binding CreateCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Criar categoria" VerticalAlignment="Center"/>
+              <i:Icon Value="fa-solid fa-check" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Border>
+
+      <!-- BODY -->
+      <StackPanel Margin="28,10,28,30" Spacing="24">
+
+        <!-- Nome da Categoria -->
+        <StackPanel Spacing="9">
+          <TextBlock Classes="lbl" Text="NOME DA CATEGORIA"/>
+          <Border Classes="field">
+            <DockPanel>
+              <i:Icon Value="fa-solid fa-layer-group" FontSize="17" DockPanel.Dock="Left" Margin="0,0,10,0"
+                      VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+              <TextBox Classes="bare" Watermark="Ex.: Finanças, Jogos..." Text="{Binding Name}"/>
+            </DockPanel>
+          </Border>
+        </StackPanel>
+
+        <!-- Cor do icone -->
+        <StackPanel Spacing="9">
+          <TextBlock Classes="lbl" Text="COR DA CATEGORIA"/>
+          <StackPanel Orientation="Horizontal" Spacing="14">
+            <Border Width="46" Height="46" CornerRadius="12" Background="{Binding SelectedBadgeColor}">
+              <TextBlock Text="{Binding Initial}" Foreground="White" FontWeight="Bold" FontSize="18"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="9" VerticalAlignment="Center">
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#64748b">
+                <Border Classes="swatch-dot" Background="#64748b"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#3aa39a">
+                <Border Classes="swatch-dot" Background="#3aa39a"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#2e7d32">
+                <Border Classes="swatch-dot" Background="#2e7d32"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#c48a2b">
+                <Border Classes="swatch-dot" Background="#c48a2b"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#5b8def">
+                <Border Classes="swatch-dot" Background="#5b8def"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#b06fd0">
+                <Border Classes="swatch-dot" Background="#b06fd0"/></Button>
+              <Button Classes="swatch" Command="{Binding SelectBadgeColorCommand}" CommandParameter="#d15b6a">
+                <Border Classes="swatch-dot" Background="#d15b6a"/></Button>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+      </StackPanel>
+
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="Portunus.App.Domain/Portunus.App.Domain.csproj" Id="75635668-3f0c-46c4-9ee7-f2952d352006" />
     <Project Path="Portunus.App/Portunus.App.csproj" />
     <Project Path="Portunus.Core/Portunus.Core.csproj" />
     <Project Path="Portunus.Platform/Portunus.Platform.csproj" Id="c69ea8f3-ec08-4177-b690-7751945c3c95" />

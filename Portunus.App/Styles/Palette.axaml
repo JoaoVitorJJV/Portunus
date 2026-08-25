@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- Fontes: troque pelo formato avares:// quando empacotar os .ttf em Assets/Fonts -->
-<FontFamily x:Key="InterFont">avares://Portunus.App/Assets/Fonts/Inter/static/Inter_18pt-Regular.ttf#Inter 18pt</FontFamily>
-<FontFamily x:Key="SerifFont">avares://Portunus.App/Assets/Fonts/Fraunces/static/Fraunces_72pt-Bold.ttf#Fraunces 72pt</FontFamily>
-<FontFamily x:Key="MonoFont">avares://Portunus.App/Assets/Fonts/JetBrains_Mono/static/JetBrainsMono-Regular.ttf#JetBrains Mono</FontFamily>
+    <FontFamily x:Key="InterFont">avares://Portunus.App/Assets/Fonts/Inter/static/Inter_18pt-Regular.ttf#Inter 18pt</FontFamily>
+    <FontFamily x:Key="SerifFont">avares://Portunus.App/Assets/Fonts/Fraunces/static/Fraunces_72pt-Bold.ttf#Fraunces 72pt</FontFamily>
+    <FontFamily x:Key="MonoFont">avares://Portunus.App/Assets/Fonts/JetBrains_Mono/static/JetBrainsMono-Regular.ttf#JetBrains Mono</FontFamily>
 
   <ResourceDictionary.ThemeDictionaries>
     <!-- ===== SÁLVIA (claro) ===== -->
@@ -30,6 +30,8 @@
       <Color x:Key="RingTrackColor">#e5eae7</Color>
       <Color x:Key="GlowColor">#22157a5b</Color>
       <Color x:Key="SealEndColor">#0d5a42</Color>
+      <Color x:Key="SelBgColor">#157a5b</Color>
+      <Color x:Key="SelInkColor">#ffffff</Color>
     </ResourceDictionary>
     <!-- ===== GRAFITE (escuro) ===== -->
     <ResourceDictionary x:Key="Dark">
@@ -54,6 +56,8 @@
       <Color x:Key="RingTrackColor">#2a3236</Color>
       <Color x:Key="GlowColor">#263fb389</Color>
       <Color x:Key="SealEndColor">#0d5a42</Color>
+      <Color x:Key="SelBgColor">#157a5b</Color>
+      <Color x:Key="SelInkColor">#ffffff</Color>
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 
@@ -77,6 +81,8 @@
   <SolidColorBrush x:Key="WarnBrush"         Color="{DynamicResource WarnColor}"/>
   <SolidColorBrush x:Key="BadBrush"          Color="{DynamicResource BadColor}"/>
   <SolidColorBrush x:Key="RingTrackBrush"    Color="{DynamicResource RingTrackColor}"/>
+  <SolidColorBrush x:Key="SelBgBrush"        Color="{DynamicResource SelBgColor}"/>
+  <SolidColorBrush x:Key="SelInkBrush"       Color="{DynamicResource SelInkColor}"/>
 
   <!-- Gradiente do selo (usa a cor de acento do tema) -->
   <LinearGradientBrush x:Key="SealBrush" StartPoint="0%,0%" EndPoint="100%,100%">

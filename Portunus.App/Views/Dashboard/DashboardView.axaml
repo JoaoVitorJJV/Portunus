@@ -1,0 +1,634 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Portunus.App.ViewModels.Dashboard"
+             xmlns:dto="using:Portunus.App.ViewModels.DTO.Dashboard"
+             xmlns:i="using:Projektanker.Icons.Avalonia"
+             x:Class="Portunus.App.Views.Dashboard.DashboardView"
+             xmlns:Svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             x:DataType="vm:DashboardViewModel"
+             FontFamily="{DynamicResource InterFont}"
+             Background="{DynamicResource BgBrush}">
+       <UserControl.Styles>
+        <!-- Esconde os botões liberando o espaço físico na direita -->
+        <Style Selector="Button.nav-item Button.delete-action, Button.item Button.delete-action, Button.item Button.fav-action">
+          <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
+        <!-- Ao passar o mouse, eles aparecem e empurram o que estiver à esquerda deles -->
+        <Style Selector="Button.nav-item:pointerover Button.delete-action, Button.item:pointerover Button.delete-action, Button.item:pointerover Button.fav-action">
+          <Setter Property="IsVisible" Value="True"/>
+        </Style>
+
+        <!-- A estrela fica SEMPRE visível em seu espaço se já estiver favoritada -->
+        <Style Selector="Button.item Button.fav-action.is-fav">
+          <Setter Property="IsVisible" Value="True"/>
+        </Style>
+      </UserControl.Styles>
+    <UserControl.DataTemplates>
+    
+        <DataTemplate x:DataType="vm:ShareEntryViewModel">
+          <Border Background="{DynamicResource BgBrush}" CornerRadius="14" Padding="24" Width="340"
+                  BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="1"
+                  BoxShadow="0 8 32 0 #40000000">
+        
+            <StackPanel Spacing="16">
+              <TextBlock Text="Compartilhar Senha" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
+          
+              <TextBlock Text="{Binding ItemTitle}" FontSize="14" Foreground="{DynamicResource AccentBrush}" 
+                         HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+          
+              <!-- Fundo branco forçado para o QR Code ser legível em qualquer tema (Dark/Light) -->
+              <Border Background="White" CornerRadius="8" Padding="12" HorizontalAlignment="Center">
+                <Image Source="{Binding QrImage}" Width="180" Height="180"/>
+              </Border>
+
+              <TextBlock Text="Aponte a câmera do celular para ler os dados da credencial temporariamente." 
+                         TextWrapping="Wrap" TextAlignment="Center" FontSize="12.5" Foreground="{DynamicResource TextFaintBrush}"/>
+
+             <Button Classes="ghost" Margin="0,8,0,0" HorizontalAlignment="Stretch" Command="{Binding CancelCommand}">
+              <TextBlock Text="Fechar" Foreground="{DynamicResource TextDimBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Button>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+    
+  </UserControl.DataTemplates>
+    <Grid>
+        <DockPanel>
+            <Border DockPanel.Dock="Top" Height="52" Background="{DynamicResource Bg2Brush}"
+                BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,0,1">
+            <Grid Margin="14,0" VerticalAlignment="Center">
+            <!-- seletor de cofre -->
+            <StackPanel Orientation="Horizontal" Spacing="9" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Border>
+                    <Svg Path="/Assets/Icons/export/portune-short-icon.svg" Width="16" Height="16"/>
+                    </Border>
+                <StackPanel>
+                    <TextBlock Classes="wm-sm" Text="Portune"/>
+                    <TextBlock FontSize="11" Foreground="{DynamicResource TextFaintBrush}" Text="Todos os cofres ▾"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ações à direita -->
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Classes="new-btn" Command="{Binding NewItemCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="7">
+                    <i:Icon Value="fa-solid fa-plus" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
+                    <TextBlock Text="Novo item" VerticalAlignment="Center"/>
+                </StackPanel>
+                </Button>
+            </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ================= CORPO 3 COLUNAS ================= -->
+            <Grid ColumnDefinitions="286,336,*">
+
+            <!-- ========== SIDEBAR ==========-->
+            <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="10,12">
+                <!-- 1. FOOTER NOVO AQUI (Ancorado na base máxima) -->
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding AppVersionDisplay}" 
+                            FontSize="11" FontWeight="SemiBold"
+                            Foreground="{DynamicResource TextFaintBrush}" 
+                            HorizontalAlignment="Center" Margin="0,18,0,0"/>
+
+                <!-- 2. BOTÃO DE TRAVAR ISOLADO (Aparece mesmo sem o Sentinela) -->
+                    <Button ZIndex="99" DockPanel.Dock="Bottom" Classes="vs-lock" Margin="0,14,0,0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
+                            Command="{Binding LockCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                        <i:Icon Value="fa-solid fa-lock" FontSize="13"/>
+                        <TextBlock Text="Travar cofre" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    </Button>
+
+                <!-- badge inferior: Sentinela + contagem + travar -->
+                <!--
+                <Border DockPanel.Dock="Bottom" Classes="vs-card" Margin="0,14,0,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="13,12">
+                    <Grid Width="42" Height="42">
+                        <Ellipse Width="34" Height="34" Stroke="{DynamicResource RingTrackBrush}" StrokeThickness="5"/>
+                        <Ellipse Width="34" Height="34" Stroke="{DynamicResource OkBrush}" StrokeThickness="5"
+                                StrokeLineCap="Round" StrokeDashArray="4.9,1.2">
+                        <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                        </Ellipse>
+                        <TextBlock Text="{Binding SentinelaScore}" FontSize="12" FontWeight="Bold"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Foreground="{DynamicResource TextBrush}"/>
+                    </Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SentinelaLabel}" FontSize="12.5" FontWeight="Bold"
+                                    Foreground="{DynamicResource TextBrush}"/>
+                        <TextBlock Text="{Binding SentinelaDetail}" FontSize="11"
+                                    Foreground="{DynamicResource TextDimBrush}"/>
+                    </StackPanel>
+                    </StackPanel>
+                    <Border Background="{DynamicResource Surface2Brush}"
+                            BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,1,0,0">
+                    <Grid Margin="13,9">
+                        <TextBlock Text="{Binding VaultCountLabel}" FontSize="12" FontWeight="SemiBold"
+                                    Foreground="{DynamicResource TextDimBrush}"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Button Classes="vs-lock" HorizontalAlignment="Right" Command="{Binding LockCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <i:Icon Value="fa-solid fa-lock" FontSize="13"/>
+                            <TextBlock Text="Travar" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        </Button>
+                    </Grid>
+                    </Border>
+                </StackPanel>
+                </Border>-->
+
+                <!-- navegação (topo, rolável) -->
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Button Classes="nav-item" Classes.active="{Binding IsAllItemsSelected}" HorizontalAlignment="Stretch" Command="{Binding SelectAllItemsCommand}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="11" HorizontalAlignment="Left">
+                        <i:Icon Value="fa-solid fa-table-cells-large" FontSize="17"/>
+                        <TextBlock Text="Todos os itens" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding AllItems}" Classes="ct" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                    </Button>
+  
+                    <Button Classes="nav-item" Classes.active="{Binding IsFavoritesSelected}" HorizontalAlignment="Stretch" Command="{Binding SelectFavoritesItemsCommand}">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="11" HorizontalAlignment="Left">
+                        <i:Icon Value="fa-solid fa-star" FontSize="17"/>
+                        <TextBlock Text="Favoritos" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding FavoritedEntryCount}" Classes="ct" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                    </Button>
+
+                    <Grid Margin="11,16,0,6">
+                        <TextBlock Classes="sec-label" Text="CATEGORIAS" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <Button Classes="sec-add" HorizontalAlignment="Right" VerticalAlignment="Center" Command="{Binding NewCategoryCommand}">
+                        <i:Icon Value="fa-solid fa-plus" FontSize="13"/>
+                        </Button>
+                    </Grid>
+                    <TextBlock IsVisible="{Binding !HasCategories}"
+                        Text="Crie sua primeira categoria"
+                        Foreground="{DynamicResource TextFaintBrush}"
+                        FontSize="12"
+                        Margin="11,4,11,10"/>
+                    <ItemsControl ItemsSource="{Binding DashboardCategories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="dto:CategoriesDashboard">
+                                <Button Classes="nav-item" HorizontalAlignment="Stretch" 
+                                    Command="{Binding DataContext.SelectCategoryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                    CommandParameter="{Binding}">
+                                    <DockPanel LastChildFill="True">
+    
+                                    <!-- Ancorado na extrema Direita -->
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Count}" Classes="ct" VerticalAlignment="Center"/>
+      
+                                        <Button Classes="delete-action" Background="Transparent" BorderThickness="0" Padding="4"
+                                                Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}">
+                                        <i:Icon Value="fa-solid fa-trash" FontSize="13" Foreground="{DynamicResource BadBrush}"/>
+                                        </Button>
+                                    </StackPanel>
+    
+                                    <!-- O texto preenche o resto e tem "..." se for muito grande -->
+                                    <StackPanel Orientation="Horizontal" Spacing="11" VerticalAlignment="Center" Margin="0,0,8,0">
+                                        <Border Width="8" Height="8" CornerRadius="3" Background="{Binding Badge}"/>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+    
+                                    </DockPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                        
+
+                    <Grid Margin="11,16,0,6" ColumnDefinitions="*,Auto,Auto">
+                    <TextBlock Grid.Column="0" Classes="sec-label" Text="COFRES" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+  
+                    <!-- Botão de Importar -->
+                    <Button Grid.Column="1" Classes="sec-add" Margin="0,0,10,0" ToolTip.Tip="Importar arquivo" Command="{Binding ImportVaultCommand}">
+                    <i:Icon Value="fa-solid fa-file-import" FontSize="13"/>
+                    </Button>
+  
+                    <!-- Botão de Novo Cofre -->
+                    <Button Grid.Column="2" Classes="sec-add" ToolTip.Tip="Novo cofre" Command="{Binding NewVaultCommand}">
+                    <i:Icon Value="fa-solid fa-plus" FontSize="13"/>
+                    </Button>
+                </Grid>
+
+                    <ItemsControl ItemsSource="{Binding UserVaults}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="dto:VaultsDashboard">
+                                    <Button Classes="nav-item" Classes.active="{Binding IsSelected}" HorizontalAlignment="Stretch"
+                                        Command="{Binding DataContext.ToggleVaultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}">
+    
+                                    <!-- GRID SEM COLUNAS: Garante que um lado não afete o outro -->
+                                    <Grid MinHeight="30">
+        
+                                        <!-- Esquerda: Fica 100% ancorado e estático -->
+                                        <!-- O Margin="0,0,60,0" garante que nomes gigantes parem antes de bater na lixeira -->
+                                        <StackPanel Orientation="Horizontal" Spacing="11" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,60,0">
+                                            <i:Icon Value="{Binding Icon}" FontSize="17"/>
+                                            <TextBlock Text="{Binding VaultName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+
+                                        <!-- Direita: Cresce para a esquerda quando o mouse passa -->
+                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Count}" Classes="ct" VerticalAlignment="Center"/>
+                                            <Button Classes="iconbtn delete-action" Background="Transparent" BorderThickness="0" Padding="0"
+                                                    Command="{Binding DataContext.DeleteVaultCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <i:Icon Value="fa-solid fa-trash" FontSize="13" Foreground="{DynamicResource BadBrush}"/>
+                                            </Button>
+                                        </StackPanel>
+        
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    <!-- IMPLEMENTAÇÃO FUTURA -->
+                    <!--
+                    <TextBlock Classes="sec-label" Text="TAGS" Margin="11,16,11,6"/>
+                    <Button Classes="tag-row" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="#" Foreground="{DynamicResource BrassBrush}" FontWeight="Bold"/>
+                        <TextBlock Text="banco" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    </Button>
+                    <Button Classes="tag-row" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="#" Foreground="{DynamicResource BrassBrush}" FontWeight="Bold"/>
+                        <TextBlock Text="jogos" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    </Button>
+                    <Button Classes="tag-row" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="#" Foreground="{DynamicResource BrassBrush}" FontWeight="Bold"/>
+                        <TextBlock Text="importante" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    </Button>
+                    -->
+                </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+            </Border>
+
+            <!-- ========== LISTA ========== -->
+            <Border Grid.Column="1" Background="{DynamicResource Bg2Brush}"
+                    BorderBrush="{DynamicResource BorderSoftBrush}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <!-- busca -->
+                <Border DockPanel.Dock="Top" Padding="12,12,12,8">
+                <Border Classes="search">
+                    <DockPanel>
+                    <i:Icon Value="fa-solid fa-magnifying-glass" FontSize="15" DockPanel.Dock="Left"
+                            Margin="0,0,9,0" VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}"/>
+                    <TextBox Classes="bare" Text="{Binding SearchQuery}" Watermark="{Binding SearchWatermark}"/>
+                    </DockPanel>
+                </Border>
+                </Border>
+
+                <!-- cabeçalho da lista -->
+                <Grid DockPanel.Dock="Top" Margin="15,4,15,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <i:Icon Value="{Binding CurrentPageIcon}" FontSize="15" Foreground="{DynamicResource AccentBrush}"/>
+    
+                    <TextBlock Text="{Binding CurrentPageTitle}" FontSize="13" FontWeight="SemiBold"
+                                Foreground="{DynamicResource TextBrush}"/>
+                </StackPanel>
+                <Button Classes="iconbtn" HorizontalAlignment="Right">
+                    <i:Icon Value="fa-solid fa-arrow-down-short-wide" FontSize="16"
+                            Foreground="{DynamicResource TextFaintBrush}"/>
+                </Button>
+                </Grid>
+
+                <!-- itens -->
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <Panel Margin="6,0,6,8">
+
+                    <TextBlock IsVisible="{Binding !HasItems}"
+                                Text="Não há nenhuma senha salva. Tente salvar sua primeira senha ao cofre."
+                                TextWrapping="Wrap"
+                                Foreground="{DynamicResource TextFaintBrush}"
+                                HorizontalAlignment="Center" VerticalAlignment="Top"
+                                Margin="20" TextAlignment="Center"/>
+
+                    <ItemsControl ItemsSource="{Binding Items}"
+                                    IsVisible="{Binding HasItems}">
+                        <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:DashboardItem">
+                            <StackPanel>
+                            <TextBlock Classes="grp" Text="{Binding GroupHeader}" IsVisible="{Binding ShowGroupHeader}"/>
+    
+                            <Button Classes="item" Classes.sel="{Binding IsSelected}" HorizontalAlignment="Stretch"
+                                    Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}">
+                                <Grid ColumnDefinitions="*,Auto">
+        
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" Margin="0,0,12,0">
+                                    <Border Width="34" Height="34" CornerRadius="9" Background="{Binding FavColor}">
+                                    <TextBlock Text="{Binding Initial}" Foreground="White" FontWeight="Bold"
+                                                FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Classes="item-t" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Classes="item-s" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </StackPanel>
+        
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+          
+                                    <Button Classes="iconbtn fav-action" Classes.is-fav="{Binding IsFavorite}"
+                                            Command="{Binding DataContext.ToggleFavoriteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}">
+                                    <i:Icon Value="{Binding FavoriteIcon}" FontSize="14" Foreground="{DynamicResource BrassBrush}"/>
+                                    </Button>
+
+                                    <Button Classes="iconbtn delete-action" 
+                                            Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding}">
+                                    <i:Icon Value="fa-solid fa-trash" FontSize="14" Foreground="{DynamicResource BadBrush}"/>
+                                    </Button>
+
+                                </StackPanel>
+                                </Grid>
+                            </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    </Panel>
+                </ScrollViewer>
+            </DockPanel>
+            </Border>
+
+            <!-- ========== DETALHE ========== -->
+            <Border Grid.Column="2" Background="{DynamicResource BgBrush}">
+                <Panel>
+                    <StackPanel IsVisible="{Binding !HasSelection}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Spacing="14" Margin="40">
+                    <Border Width="64" Height="64" CornerRadius="18"
+                            Background="{DynamicResource Surface2Brush}"
+                            HorizontalAlignment="Center">
+                    <i:Icon Value="fa-solid fa-hand-pointer" FontSize="26"
+                            Foreground="{DynamicResource TextFaintBrush}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Selecione um item para ver os detalhes"
+                                FontSize="14" Foreground="{DynamicResource TextDimBrush}"
+                                HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+                </StackPanel>
+                <DockPanel IsVisible="{Binding HasSelection}">
+                    <!-- cabeçalho do detalhe -->
+                    <Grid DockPanel.Dock="Top" Margin="26,22,26,16" ColumnDefinitions="Auto,*,Auto">
+                    <Border Grid.Column="0" Width="52" Height="52" CornerRadius="14" Background="{Binding Detail.FavColor}">
+                        <TextBlock Text="{Binding Detail.Initial}" Foreground="White" FontWeight="Bold" FontSize="22"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="15,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Classes="det-title" Text="{Binding Detail.Title}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="7" Margin="0,7,0,0">
+                        <Border Classes="cchip">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Border Width="7" Height="7" CornerRadius="3" Background="{Binding Detail.CategoryColor}"/>
+                            <TextBlock Text="{Binding Detail.Category}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="cchip">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                            <i:Icon Value="fa-solid fa-shield-halved" FontSize="13"/>
+                            <TextBlock Text="{Binding Detail.VaultName}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+                        <Button Classes="abtn" Command="{Binding EditCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <i:Icon Value="fa-solid fa-pen" FontSize="14" Foreground="{DynamicResource AccentBrush}"/>
+                            <TextBlock Text="Editar" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        </Button>
+                        <Button Classes="abtn icon" Command="{Binding ShareCommand}">
+                          <i:Icon Value="fa-solid fa-share-nodes" FontSize="14"/>
+                        </Button>
+                        <!--<Button Classes="abtn icon"><i:Icon Value="fa-solid fa-ellipsis" FontSize="14"/></Button>-->
+                    </StackPanel>
+                    </Grid>
+
+                    <!-- corpo rolável do detalhe -->
+                    <ScrollViewer>
+                    <StackPanel Margin="26,4,26,26">
+
+                        <!-- grupo de campos -->
+                        <Border Classes="fgroup">
+                        <StackPanel>
+                            <!-- usuário -->
+                            <Grid Classes="field" ColumnDefinitions="20,*,Auto">
+                            <i:Icon Grid.Column="0" Value="fa-solid fa-user" FontSize="17"
+                                    Foreground="{DynamicResource TextFaintBrush}"/>
+                            <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                                <TextBlock Classes="flabel" Text="USUÁRIO"/>
+                                <TextBlock Classes="fval mono" Text="{Binding Detail.Username}"/>
+                            </StackPanel>
+                            <Button Grid.Column="2" Classes="mini" Command="{Binding CopyCommand}" CommandParameter="Usuário">
+                                <i:Icon Value="fa-solid fa-copy" FontSize="16"/>
+                            </Button>
+                            </Grid>
+
+                            <!-- senha -->
+                            <Border Classes="field-sep"/>
+                            <Grid Classes="field" ColumnDefinitions="20,*,Auto,Auto">
+                            <i:Icon Grid.Column="0" Value="fa-solid fa-key" FontSize="17"
+                                    Foreground="{DynamicResource TextFaintBrush}"/>
+                            <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                                <TextBlock Classes="flabel" Text="SENHA"/>
+                                <TextBlock Classes="fval mono" Text="{Binding Detail.PasswordDisplay}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center"
+                                        Margin="0,0,4,0">
+                                <Grid Width="26" Height="26">
+                                <Ellipse Width="22" Height="22" Stroke="{DynamicResource RingTrackBrush}" StrokeThickness="4"/>
+                                <Ellipse Width="22" Height="22" Stroke="{DynamicResource OkBrush}" StrokeThickness="4"
+                                            StrokeLineCap="Round" StrokeDashArray="100,0">
+                                    <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                </Ellipse>
+                                </Grid>
+                                <TextBlock Text="{Binding Detail.StrengthLabel}" FontWeight="Bold" FontSize="12"
+                                            Foreground="{DynamicResource OkBrush}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <Button Classes="mini" Command="{Binding RevealPasswordCommand}">
+                                    <i:Icon Value="{Binding Detail.RevealIcon}" FontSize="16"/>
+                                </Button>
+                                <Button Classes="mini" Command="{Binding CopyCommand}" CommandParameter="Senha">
+                                <i:Icon Value="fa-solid fa-copy" FontSize="16"/>
+                                </Button>
+                            </StackPanel>
+                            </Grid>
+
+                            <!-- OTP -->
+                            <!--
+                            <Border Classes="field-sep"/>
+                            <Grid Classes="field" ColumnDefinitions="20,*,Auto">
+                            <i:Icon Grid.Column="0" Value="fa-solid fa-shield-halved" FontSize="17"
+                                    Foreground="{DynamicResource TextFaintBrush}"/>
+                            <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                                <TextBlock Classes="flabel" Text="CÓDIGO DE USO ÚNICO"/>
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                <TextBlock Classes="otp-code" Text="{Binding Detail.OtpCode}"/>
+                                <Grid Width="26" Height="26" VerticalAlignment="Center">
+                                    <Ellipse Width="22" Height="22" Stroke="{DynamicResource RingTrackBrush}" StrokeThickness="4"/>
+                                    <Ellipse Width="22" Height="22" Stroke="{DynamicResource AccentBrush}" StrokeThickness="4"
+                                            StrokeLineCap="Round" StrokeDashArray="100,0">
+                                    <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                    </Ellipse>
+                                </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Grid.Column="2" Classes="mini" Command="{Binding CopyCommand}" CommandParameter="Código">
+                                <i:Icon Value="fa-solid fa-copy" FontSize="16"/>
+                            </Button>
+                            </Grid>-->
+                        </StackPanel>
+                        </Border>
+
+                        <!-- site -->
+                        <Border Classes="fgroup">
+                        <Grid Classes="field" ColumnDefinitions="20,*,Auto">
+                            <i:Icon Grid.Column="0" Value="fa-solid fa-globe" FontSize="17"
+                                    Foreground="{DynamicResource TextFaintBrush}"/>
+                            <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                            <TextBlock Classes="flabel" Text="SITE"/>
+                            <TextBlock Classes="fval" Foreground="{DynamicResource AccentBrush}"
+                                        Text="{Binding Detail.Url}"/>
+                            </StackPanel>
+                            <Button Grid.Column="2" Classes="mini" Command="{Binding OpenUrlCommand}">
+                            <i:Icon Value="fa-solid fa-arrow-up-right-from-square" FontSize="16"/>
+                            </Button>
+                        </Grid>
+                        </Border>
+
+                        <!-- ===== CÓDIGOS DE RECUPERAÇÃO ===== -->
+                        <Border Classes="fgroup">
+                        <StackPanel>
+                            <Grid Margin="16,12,16,10" ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <i:Icon Value="fa-solid fa-life-ring" FontSize="16" Foreground="{DynamicResource BrassBrush}"/>
+                                <TextBlock Classes="flabel" Text="CÓDIGOS DE RECUPERAÇÃO" VerticalAlignment="Center"/>
+                                </StackPanel>
+  
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right" IsVisible="{Binding Detail.HasRecoveryCodes}">
+                                <Button Classes="rec-linkbtn" Command="{Binding ToggleRecoveryCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <i:Icon Value="fa-solid fa-eye" FontSize="13"/>
+                                    <TextBlock Text="{Binding Detail.RecoveryToggleLabel}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="rec-linkbtn" Command="{Binding CopyCommand}" CommandParameter="Todos os códigos">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <i:Icon Value="fa-solid fa-copy" FontSize="13"/>
+                                    <TextBlock Text="Copiar" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                </StackPanel>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding Detail.RecoveryCodes}" Margin="12,0,12,4">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                <UniformGrid Columns="2"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RecoveryCode">
+                                <Button Classes="rec-cell" Classes.used="{Binding IsUsed}"
+                                        HorizontalAlignment="Stretch" Margin="3"
+                                        Command="{Binding DataContext.CopyCodeCommand,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Classes="rec-code" Text="{Binding Display}"
+                                                VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Classes="rec-n" Text="{Binding Number}"
+                                                VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="16,10,16,13">
+                            <Border Width="6" Height="6" CornerRadius="3" Background="{DynamicResource WarnBrush}"
+                                    VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Detail.RecoveryFooter}" FontSize="11.5"
+                                        Foreground="{DynamicResource TextFaintBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        </Border>
+
+                        <!-- notas -->
+                        <Border Classes="fgroup">
+                        <StackPanel Margin="16,13" Spacing="6">
+                            <TextBlock Classes="flabel" Text="NOTAS"/>
+                            <TextBlock Text="{Binding Detail.Notes}" TextWrapping="Wrap" FontSize="13.5"
+                                        Foreground="{DynamicResource TextDimBrush}" LineHeight="21"/>
+                        </StackPanel>
+                        </Border>
+
+                        <!-- rodapé -->
+                        <StackPanel Orientation="Horizontal" Spacing="24" Margin="4,2">
+                        <TextBlock FontSize="11.5" Foreground="{DynamicResource TextFaintBrush}">
+                            <Run Text="Criado "/><Run Text="{Binding Detail.Created}" FontWeight="SemiBold"
+                                Foreground="{DynamicResource TextDimBrush}"/>
+                        </TextBlock>
+                        <TextBlock FontSize="11.5" Foreground="{DynamicResource TextFaintBrush}">
+                            <Run Text="Modificado "/><Run Text="{Binding Detail.Modified}" FontWeight="SemiBold"
+                                Foreground="{DynamicResource TextDimBrush}"/>
+                        </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+                </Panel>
+
+            </Border>
+        </Grid>
+        </DockPanel>
+          <!-- ===== OVERLAY DO MODAL DE CRIAR NOVA PASSWORD ===== -->
+          <Panel ZIndex="100"
+                 IsVisible="{Binding ActiveModal, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <!-- backdrop: clicar fora = cancelar -->
+            <Button Classes="modal-backdrop"
+                    Command="{Binding ActiveModal.CancelCommand}">
+              <Button.Styles>
+                <Style Selector="Button.modal-backdrop">
+                  <Style.Animations>
+                    <Animation Duration="0:0:0.18" FillMode="Forward">
+                      <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
+                      <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+                    </Animation>
+                  </Style.Animations>
+                </Style>
+              </Button.Styles>
+            </Button>
+
+            <ContentControl Content="{Binding ActiveModal}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Panel>
+    </Grid>
+  <!-- ================= TITLEBAR ================= -->
+
+</UserControl>

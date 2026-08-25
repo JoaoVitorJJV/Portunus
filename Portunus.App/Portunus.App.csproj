@@ -4,13 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+	<ApplicationIcon>Assets\Icons\export\portune-icon.ico</ApplicationIcon>
+	<Version>1.0.0</Version>
+	<AssemblyTitle>Portunus</AssemblyTitle>
+	<Product>Portunus</Product>
+	<Company>PortunusSafe</Company>
+	<Description>Cofre de senhas local</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Assets\Icons\" />
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <Folder Include="Services\" />
   </ItemGroup>
+
 
   <ItemGroup>
 	  <!--
@@ -22,6 +29,7 @@
 
 	<PackageReference Include="Avalonia" Version="11.3.10" />
 	<PackageReference Include="Avalonia.Desktop" Version="11.3.10" />
+	<PackageReference Include="Avalonia.Svg.Skia" Version="11.3.0" />
 	<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.10" />
 	<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.10" />
 	  
@@ -30,8 +38,18 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
     <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.6.2" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.2" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.6.2" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+    <PackageReference Include="Velopack" Version="1.2.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portunus.App.Domain\Portunus.App.Domain.csproj" />
+    <ProjectReference Include="..\Portunus.Core\Portunus.Core.csproj" />
+    <ProjectReference Include="..\Portunus.Platform\Portunus.Platform.csproj" />
+  </ItemGroup>
+
 </Project>

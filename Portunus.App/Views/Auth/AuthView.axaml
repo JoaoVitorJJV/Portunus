@@ -2,12 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Portunus.App.ViewModels.Auth"
              xmlns:i="using:Projektanker.Icons.Avalonia"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:Svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              x:Class="Portunus.App.Views.Auth.AuthView"
              x:DataType="vm:AuthViewModel"
              FontFamily="{DynamicResource InterFont}"
              Background="{DynamicResource BgBrush}">
-
-  <Design.DataContext><vm:AuthViewModel/></Design.DataContext>
 
   <Grid>
     <!-- Glow -->
@@ -25,13 +25,7 @@
     <ScrollViewer IsVisible="{Binding IsWelcome}" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Width="380" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,24">
         <Border Classes="seal" HorizontalAlignment="Center" Margin="0,0,0,16">
-          <Viewbox Width="30" Height="30">
-            <Canvas Width="24" Height="24">
-              <Path Data="M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z" Fill="White" Opacity="0.95"/>
-              <Path Data="M12 8.5 V12 M12 12 a1.6 1.6 0 1 0 0 3.2 a1.6 1.6 0 1 0 0 -3.2 Z"
-                    Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6"/>
-            </Canvas>
-          </Viewbox>
+          <Image Source="/Assets/Icons/export/png/portune-icon-64.png" Width="30" Height="30" Stretch="Uniform"/>
         </Border>
         <TextBlock Classes="wm" Text="Bem-vindo ao Portune" HorizontalAlignment="Center"/>
         <TextBlock Classes="sub" Margin="0,6,0,0" TextWrapping="Wrap" TextAlignment="Center">
@@ -106,8 +100,12 @@
             </StackPanel>
           </Button>
 
-          <TextBlock HorizontalAlignment="Center" FontSize="12.5" Margin="0,10,0,0"
-                     Foreground="{DynamicResource TextDimBrush}" Text="Já tem um cofre? Importar arquivo .vault"/>
+          <Button Background="Transparent" BorderThickness="0" Padding="8,4" 
+                    HorizontalAlignment="Center" Margin="0,10,0,0" Cursor="Hand"
+                    Command="{Binding ImportVaultCommand}">
+              <TextBlock FontSize="12.5" Foreground="{DynamicResource AccentBrush}" 
+                         Text="Já tem um cofre? Importar arquivo .vault"/>
+            </Button>
         </StackPanel>
       </StackPanel>
     </ScrollViewer>
@@ -115,17 +113,14 @@
     <!-- ================= SENHA-MESTRA ================= -->
     <StackPanel Width="380" IsVisible="{Binding IsMaster}" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Border Classes="seal" HorizontalAlignment="Center" Margin="0,0,0,16">
-        <Viewbox Width="30" Height="30">
-          <Canvas Width="24" Height="24">
-            <Path Data="M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5l7-3z" Fill="White" Opacity="0.95"/>
-            <Path Data="M12 8.5 V12 M12 12 a1.6 1.6 0 1 0 0 3.2 a1.6 1.6 0 1 0 0 -3.2 Z"
-                  Stroke="{DynamicResource AccentBrush}" StrokeThickness="1.6"/>
-          </Canvas>
-        </Viewbox>
+        <Image Source="/Assets/Icons/export/png/portune-icon-64.png" 
+               Width="64" Height="64" 
+               Stretch="Uniform" 
+               HorizontalAlignment="Center"/>
       </Border>
-      <TextBlock Classes="wm" Text="Portune" HorizontalAlignment="Center"/>
+      <TextBlock Classes="wm" Text="Portunus" HorizontalAlignment="Center"/>
       <TextBlock Classes="sub" Margin="0,6,0,0">
-        <Run Text="Cofre "/><Run Text="Pessoal" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/><Run Text=" · destravar"/>
+        <Run Text="Cofre "/><Run Text="Pessoal" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/>
       </TextBlock>
 
       <StackPanel Spacing="11" Margin="0,26,0,0">
@@ -146,16 +141,26 @@
                    Foreground="{DynamicResource BadBrush}" Text="Senha incorreta. Tente novamente."/>
 
         <Button Classes="primary" IsEnabled="{Binding CanUnlock}" Command="{Binding UnlockCommand}">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <TextBlock Text="Destravar" VerticalAlignment="Center"/>
-            <i:Icon Value="fa-solid fa-lock-open" FontSize="15" Foreground="{DynamicResource AccentInkBrush}"/>
-          </StackPanel>
+          <Panel>
+            <StackPanel Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        IsVisible="{Binding !UnlockCommand.IsRunning}">
+              <TextBlock Text="Destravar"/>
+              <i:Icon Value="fa-solid fa-lock-open" FontSize="15"
+                      Foreground="{DynamicResource AccentInkBrush}"/>
+            </StackPanel>
+
+            <Ellipse Classes="spinner"
+                     IsVisible="{Binding UnlockCommand.IsRunning}"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Panel>
         </Button>
 
-        <Button Classes="ghost" Command="{Binding ShowPinCommand}">
+        <Button Classes="ghost" Command="{Binding WipeVaultCommand}">
           <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-            <i:Icon Value="fa-solid fa-lock" FontSize="15" Foreground="{DynamicResource TextDimBrush}"/>
-            <TextBlock Text="Usar PIN deste dispositivo" VerticalAlignment="Center"/>
+            <!-- Ícone e texto em vermelho (BadBrush) para indicar perigo -->
+            <i:Icon Value="fa-solid fa-trash" FontSize="15" Foreground="{DynamicResource BadBrush}"/>
+            <TextBlock Text="Apagar todo o Cofre" VerticalAlignment="Center" Foreground="{DynamicResource BadBrush}"/>
           </StackPanel>
         </Button>
 
@@ -229,6 +234,25 @@
         <Button Classes="seg" Content="PIN" Command="{Binding ShowPinCommand}"/>
       </StackPanel>
     </Border> -->
+    <Panel ZIndex="100" IsVisible="{Binding ActiveModal, Converter={x:Static ObjectConverters.IsNotNull}}">
+      
+      <!-- backdrop: clicar fora = cancelar (se quiser usar botão no fundo) -->
+      <Button Classes="modal-backdrop" Command="{Binding CloseModalCommand}">
+        <Button.Styles>
+          <Style Selector="Button.modal-backdrop">
+            <Style.Animations>
+              <Animation Duration="0:0:0.18" FillMode="Forward">
+                <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0"/></KeyFrame>
+                <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1"/></KeyFrame>
+              </Animation>
+            </Style.Animations>
+          </Style>
+        </Button.Styles>
+      </Button>
+
+      <ContentControl Content="{Binding ActiveModal}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    </Panel>
    
   </Grid>
 </UserControl>

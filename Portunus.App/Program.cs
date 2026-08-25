@@ -1,8 +1,10 @@
 ﻿using Avalonia;
+using Avalonia.Animation;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
 using Projektanker.Icons.Avalonia.MaterialDesign;
 using System;
+using Velopack;
 
 
 namespace Portunus.App;
@@ -13,8 +15,12 @@ sealed class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
+    public static void Main(string[] args) {
+        VelopackApp.Build().Run();
+
+        BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
+    } 
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
