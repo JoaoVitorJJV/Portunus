@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Portunus.App.Domain.Enum;
+using Portunus.App.Domain.Util;
 using Portunus.App.Services;
 using Portunus.App.Services.Interfaces;
 using Portunus.App.ViewModels.Dashboard;
@@ -12,7 +13,10 @@ using Portunus.App.ViewModels.DTO;
 using Portunus.App.ViewModels.Interfaces;
 using Portunus.Core.DTO;
 using Portunus.Core.Vault;
+using Portunus.Platform;
+using Portunus.Platform.Interfaces;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Portunus.App.ViewModels.Auth;
@@ -20,7 +24,9 @@ namespace Portunus.App.ViewModels.Auth;
 public partial class AuthViewModel(
     VaultService vaultService, 
     NavigationService navService,
-    INotificationService notifications
+    INotificationService notifications,
+    IAuthVerificationService authVerificationService,
+    IKeyStore keyStore
     ) : ViewModelBase, IInitializable
 {
 
@@ -28,6 +34,8 @@ public partial class AuthViewModel(
     private readonly VaultService _vaultService = vaultService;
     private readonly NavigationService _navService = navService;
     private readonly INotificationService _notifications = notifications;
+    private readonly IAuthVerificationService _authVerificationService = authVerificationService;
+    private readonly IKeyStore _keyStore = keyStore;
     #endregion
 
     [ObservableProperty]
@@ -38,6 +46,10 @@ public partial class AuthViewModel(
     public bool IsWelcome => Screen == AuthScreen.Welcome;
     public bool IsMaster  => Screen == AuthScreen.Master;
     public bool IsPin     => Screen == AuthScreen.Pin;
+
+
+    [ObservableProperty]
+    private bool _isBiometricsAvailable;
 
     [ObservableProperty] private string _vaultName = "Pessoal";
     [ObservableProperty] private bool   _isRevealed;
@@ -84,6 +96,8 @@ public partial class AuthViewModel(
         bool isVaultCreated = _vaultService.IsVaultsCreated();
         Screen = isVaultCreated ? AuthScreen.Master : AuthScreen.Welcome;
 
+        CheckBiometricsAvailability();
+
         return Task.CompletedTask;
     }
 
@@ -91,7 +105,9 @@ public partial class AuthViewModel(
 
     [RelayCommand]
     private void CloseModal() => ActiveModal = null;
-    [RelayCommand] private async Task Create() {
+
+    [RelayCommand] 
+    private async Task Create() {
         CreateVaultDTO createVaultDto = new()
         {
             MasterPassword = Password,
@@ -101,6 +117,15 @@ public partial class AuthViewModel(
         try
         {
             _vaultService.CreateVault(createVaultDto);
+
+            byte[] masterKeyBytes = Encoding.UTF8.GetBytes(createVaultDto.MasterPassword);
+            bool saved = _keyStore.TryKeyStore(Utilities.VaultNameKeyStore, masterKeyBytes);
+
+            if (saved)
+            {
+                IsBiometricsAvailable = true;
+            }
+
             _notifications.Success("Boa!", "O cofre foi criado com sucesso.");
             await _navService.NavigateAsync(Domain.Enum.Screens.Dashboard);
         }
@@ -114,6 +139,7 @@ public partial class AuthViewModel(
         }
 
     }
+
     [RelayCommand]
     private async Task Unlock()
     {
@@ -121,12 +147,27 @@ public partial class AuthViewModel(
 
         try
         {
-            bool isUnlocked = await Task.Run(() => _vaultService.UnlockVault(MasterPassword));
+            bool isUnlocked = await Task.Run(() =>
+            {
+                bool unlocked = _vaultService.UnlockVault(MasterPassword);
+
+                if (unlocked)
+                {
+                    if (!_keyStore.Exists(Utilities.VaultNameKeyStore))
+                        _keyStore.TryKeyStore(Utilities.VaultNameKeyStore, Utilities.GetBytesFromString(MasterPassword));
+                }
+
+                return unlocked;
+            });
 
             if (isUnlocked)
+            {
                 await _navService.NavigateAsync(Domain.Enum.Screens.Dashboard);
+            }
             else
+            {
                 _notifications.Error("Ops!", errorMsg);
+            }
         }
         catch (Exception)
         {
@@ -214,6 +255,29 @@ public partial class AuthViewModel(
         }
     }
 
+    [RelayCommand]
+    private async Task AuthenticateWithOSAsync()
+    {
+        bool isVerified = await _authVerificationService.VerifyUserAsync("Desbloquear o Portunus");
+
+        if (isVerified)
+        {
+            if (_keyStore.TryRetrieve(Utilities.VaultNameKeyStore, out byte[] masterKeyBytes))
+            {
+                // Converte os bytes de volta para texto (se o seu VaultService usar string)
+                string masterKey = Encoding.UTF8.GetString(masterKeyBytes);
+
+                bool success = _vaultService.UnlockVault(masterKey);
+
+                if (success)
+                    await _navService.NavigateAsync(Domain.Enum.Screens.Dashboard);
+                else
+                    _notifications.Error("Falha", "Falha ao destrancar cofre. Digite a senha manualmente");
+                    return;
+            }
+        }
+    }
+
     [RelayCommand] private void ShowWelcome() => Screen = AuthScreen.Welcome;
     [RelayCommand] private void ShowMaster()  => Screen = AuthScreen.Master;
     [RelayCommand] private void ShowPin()     => Screen = AuthScreen.Pin;
@@ -221,4 +285,12 @@ public partial class AuthViewModel(
     [RelayCommand] private void PinPress(string digit) { /* TODO */ }
     [RelayCommand] private void PinDelete() { /* TODO */ }
     [RelayCommand] private void Biometric() { /* TODO */ }
+
+    private void CheckBiometricsAvailability()
+    {
+        if (_keyStore.IsAvaliable && _keyStore.TryRetrieve(Utilities.VaultNameKeyStore, out _))
+        {
+            IsBiometricsAvailable = true;
+        }
+    }
 }

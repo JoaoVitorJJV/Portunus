@@ -61,8 +61,8 @@ jobs:
 
           {
             echo "pack=$PACK"
-            echo "msi=$MAJOR_MINOR.$RUN.0"   # ex: 0.1.42.0 - quarto segmento sempre 0 (exigência do MSI)
-            echo "asm=$BASE.0"               # ex: 0.1.0.0  - AssemblyVersion estável por base
+            echo "msi=$MAJOR_MINOR.$RUN.0"
+            echo "asm=$BASE.0"
             echo "channel=$CH"
             echo "pre=$PRE"
             echo "tag=v$PACK"
@@ -72,13 +72,12 @@ jobs:
         run: >
           dotnet publish "$APP_PROJ"
           -c Release -r win-x64 --self-contained true
+          -f net10.0-windows10.0.19041.0
           -p:Version=${{ steps.v.outputs.pack }}
           -p:FileVersion=${{ steps.v.outputs.msi }}
           -p:AssemblyVersion=${{ steps.v.outputs.asm }}
           -o ./publish
 
-      # Baixa o release anterior para o Velopack montar o pacote delta.
-      # No primeiro build do canal não existe nada -> ignora o erro.
       - name: Baixar release anterior (deltas)
         continue-on-error: true
         run: >
@@ -128,6 +127,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Instalar Workload do macOS
+        run: dotnet workload install macos
+
       - name: Instalar vpk
         run: |
           dotnet tool install -g vpk --version "$VPK_VERSION"
@@ -157,6 +159,7 @@ jobs:
         run: >
           dotnet publish "$APP_PROJ"
           -c Release -r osx-arm64 --self-contained true
+          -f net10.0-macos26.5
           -p:Version=${{ steps.v.outputs.pack }}
           -p:AssemblyVersion=${{ steps.v.outputs.asm }}
           -o ./publish

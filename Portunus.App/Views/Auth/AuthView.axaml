@@ -164,6 +164,18 @@
           </StackPanel>
         </Button>
 
+       <Button Classes="ghost" 
+                Command="{Binding AuthenticateWithOSCommand}" 
+                IsVisible="{Binding IsBiometricsAvailable}"
+                Margin="0,8,0,0"
+                HorizontalAlignment="Stretch">
+          <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <!-- Ícone e texto com a cor de destaque do app (AccentBrush) -->
+            <i:Icon Value="fa-solid fa-fingerprint" FontSize="16" Foreground="{DynamicResource AccentBrush}"/>
+            <TextBlock Text="Autenticar com Biometria / PIN" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}"/>
+          </StackPanel>
+        </Button>
+
         <Border Classes="note" Margin="0,6,0,0">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <i:Icon Value="fa-solid fa-shield-halved" FontSize="16" VerticalAlignment="Top" Foreground="{DynamicResource AccentBrush}"/>

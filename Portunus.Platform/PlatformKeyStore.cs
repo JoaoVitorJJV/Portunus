@@ -17,6 +17,8 @@ namespace Portunus.Platform
         }
 
         public void Remove(string name) { }
+
+        public bool Exists(string name) { return false; }
     }
 
     public static class PlatformKeyStore

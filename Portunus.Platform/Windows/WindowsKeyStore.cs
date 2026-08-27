@@ -6,17 +6,32 @@ using System.Security.Cryptography;
 namespace Portunus.Platform.Windows
 {
     [SupportedOSPlatform("windows")]
-    internal sealed class WindowsKeyStore(string storageDirectory) : IKeyStore
+    public sealed class WindowsKeyStore(string storageDirectory) : IKeyStore
     {
         public bool IsAvaliable => true;
         public readonly string _storageDirectory = storageDirectory;
+
+        public bool Exists(string name)
+        {
+            return File.Exists(PathFor(name));
+        }
 
         public bool TryKeyStore(string name, byte[] secret)
         {
             try
             {
+                string path = PathFor(name);
+                string directory = Path.GetDirectoryName(path)!;
 
-                Directory.CreateDirectory(_storageDirectory);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
 
                 byte[] encrypted = ProtectedData.Protect(
                     secret,
@@ -24,14 +39,14 @@ namespace Portunus.Platform.Windows
                     scope: DataProtectionScope.CurrentUser
                 );
 
-                File.WriteAllBytes(_storageDirectory, encrypted);
+                File.WriteAllBytes(path, encrypted);
+
                 return true;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return false;
             }
-
         }
         public bool TryRetrieve(string name, out byte[] secret)
         {

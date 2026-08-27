@@ -1,17 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+	
+<PropertyGroup>
+	<!-- 1. Define os Targets dependendo de onde o código está sendo compilado -->
+	<TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net10.0-windows10.0.19041.0;net10.0</TargetFrameworks>
+	<TargetFrameworks Condition="'$(OS)' != 'Windows_NT'">net10.0-macos26.5;net10.0</TargetFrameworks>
+
+	<!-- 2. Arruma o erro do WinExe (Usa WinExe no Windows, e Exe no Mac/Linux) -->
+	<OutputType Condition="'$(OS)' == 'Windows_NT'">WinExe</OutputType>
+	<OutputType Condition="'$(OS)' != 'Windows_NT'">Exe</OutputType>
+
+	<Nullable>enable</Nullable>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<ApplicationIcon>Assets\Icons\export\portune-icon.ico</ApplicationIcon>
 	<Version>1.0.0</Version>
 	<AssemblyTitle>Portunus</AssemblyTitle>
 	<Product>Portunus</Product>
 	<Company>PortunusSafe</Company>
 	<Description>Cofre de senhas local</Description>
-  </PropertyGroup>
-
+</PropertyGroup>
   <ItemGroup>
     <Folder Include="Assets\Icons\" />
     <Folder Include="Models\" />
@@ -38,7 +44,9 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
     <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.6.2" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.2" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.6.2" />

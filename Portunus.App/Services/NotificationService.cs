@@ -3,6 +3,7 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Portunus.App.Services.Interfaces;
+using Portunus.Platform.Interfaces;
 using System;
 
 namespace Portunus.App.Services
@@ -10,15 +11,17 @@ namespace Portunus.App.Services
     public sealed partial class NotificationService : ObservableObject, INotificationService
     {
         private readonly DispatcherTimer _timer;
+        private readonly INativeNotificationService _nativeNotificationService;
 
         [ObservableProperty] private bool _isVisible;
         [ObservableProperty] private string? _message;
         [ObservableProperty] private bool _isError;
         [ObservableProperty] private string? _title;
 
-        public NotificationService()
+        public NotificationService(INativeNotificationService nativeNoficationService)
         {
             _timer = new DispatcherTimer();
+            _nativeNotificationService = nativeNoficationService;
             _timer.Tick += (_, _) => { _timer.Stop(); IsVisible = false; };
         }
 
@@ -36,6 +39,11 @@ namespace Portunus.App.Services
             _timer.Stop();
             _timer.Interval = TimeSpan.FromSeconds(seconds);
             _timer.Start();
+        }
+
+        public void ShowNative(string title, string body, string iconPath)
+        {
+            _nativeNotificationService.ShowNative(title, body, iconPath);
         }
 
     }

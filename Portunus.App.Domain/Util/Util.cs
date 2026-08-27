@@ -6,6 +6,7 @@ namespace Portunus.App.Domain.Util
 {
     public static class Utilities
     {
+        public static string VaultNameKeyStore = "PortunusMasterPass";
         public static byte[] GetBytesFromString(string str)
         {
             return Encoding.UTF8.GetBytes(str);

@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,13 @@ using Portunus.App.ViewModels;
 using Portunus.App.ViewModels.Auth;
 using Portunus.App.ViewModels.Dashboard;
 using Portunus.App.Views;
+using Portunus.Platform;
+using Portunus.Platform.Interfaces;
+using Portunus.Platform.MacOS;
+using Portunus.Platform.Windows;
 using System;
+using System.IO;
+using System.Threading;
 
 namespace Portunus.App;
 
@@ -31,14 +38,35 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            IAutoStartService autoStartService = provider.GetRequiredService<IAutoStartService>();
+            var cts = new CancellationTokenSource();
+            desktop.ShutdownRequested += (sender, e) => cts.Cancel();
+
+            var jobService = provider.GetRequiredService<BackgroundJobService>();
+
+            _ = jobService.StartAsync(cts.Token);
+
+            if (!autoStartService.IsAutoStartEnabled())
+                autoStartService.EnableAutoStart();
+
+            var args = Environment.GetCommandLineArgs();
+            bool startHidden = args.Contains("--hidden");
+
             var mainWindow = new MainWindow
             {
                 DataContext = provider.GetRequiredService<MainViewModel>()
             };
             desktop.MainWindow = mainWindow;
 
+            if (startHidden)
+            {
+                // O Avalonia vai carregar, o ciclo de vida inicia, mas a janela não abre.
+                // Para não matar o app quando a janela for fechada (porque a Tray a mantém viva):
+                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            }
+
             var navigation = provider.GetRequiredService<NavigationService>();
-            await navigation.NavigateAsync(Screens.Auth);
+            await navigation.NavigateAsync(Domain.Enum.Screens.Auth);
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -46,10 +74,31 @@ public partial class App : Application
 
     private void LoadServices(ServiceCollection serviceLocator)
     {
+        var baseDir = AppContext.BaseDirectory;
+        var keystorePath = Path.Combine(baseDir, "keystore_data");
+
+        if (OperatingSystem.IsWindows())
+        {
+            serviceLocator.AddSingleton<IAutoStartService, WindowsAutoStartService>();
+            serviceLocator.AddSingleton<INativeNotificationService, WindowsNotificationNative>();
+            // Novos serviços do Windows
+            serviceLocator.AddSingleton<IAuthVerificationService, WindowsAuthVerification>();
+            serviceLocator.AddSingleton<IKeyStore>(new WindowsKeyStore(keystorePath));
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            serviceLocator.AddSingleton<IAutoStartService, MacAutoStartService>();
+            serviceLocator.AddSingleton<INativeNotificationService, MacNotificationNative>();
+
+            serviceLocator.AddSingleton<IAuthVerificationService, MacAuthVerification>();
+            serviceLocator.AddSingleton<IKeyStore, MacKeyStore>();
+        }
+
         serviceLocator.AddSingleton<NotificationService>();
         serviceLocator.AddSingleton<INotificationService>(sp => sp.GetRequiredService<NotificationService>());
         serviceLocator.AddSingleton<NavigationService>();
         serviceLocator.AddSingleton<VaultService>();
+        serviceLocator.AddSingleton<BackgroundJobService>();
 
     }
 
