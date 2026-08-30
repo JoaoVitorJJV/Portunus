@@ -10,10 +10,15 @@ namespace Portunus.Platform.Windows
     public class WindowsAutoStartService : IAutoStartService
     {
         private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-        private const string AppKeyName = "Portunus";
+
+        private string AppKeyName = "Portunus";
+
 
         public void EnableAutoStart()
         {
+            #if DEBUG
+                this.AppKeyName = "PortunusDebug";
+            #endif
             if (OperatingSystem.IsWindows())
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath, true);

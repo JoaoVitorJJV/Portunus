@@ -6,6 +6,7 @@ using Portunus.Core.Models;
 using Portunus.Core.Vault;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,20 @@ namespace Portunus.App.Services
                 return false;
             }
             
+        }
+
+        public void ExportVault(string destinationPath)
+        {
+            string currentVaultPath = Path.Combine(VaultLocation.DefaultPath);
+
+            if (File.Exists(currentVaultPath))
+            {
+                File.Copy(currentVaultPath, destinationPath, overwrite: true);
+            }
+            else
+            {
+                throw new FileNotFoundException("O arquivo do cofre não foi encontrado para exportação.");
+            }
         }
 
         public void CreateVault(CreateVaultDTO createVaultDTO)

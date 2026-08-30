@@ -16,6 +16,7 @@ using Portunus.Platform.MacOS;
 using Portunus.Platform.Windows;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace Portunus.App;
@@ -99,7 +100,6 @@ public partial class App : Application
         serviceLocator.AddSingleton<NavigationService>();
         serviceLocator.AddSingleton<VaultService>();
         serviceLocator.AddSingleton<BackgroundJobService>();
-
     }
 
     private void LoadViewModels(ServiceCollection serviceLocator)
@@ -113,6 +113,46 @@ public partial class App : Application
         serviceLocator.AddTransient<VaultEditorViewModel>();
         serviceLocator.AddSingleton<Func<VaultEditorViewModel>>(sp => () => sp.GetRequiredService<VaultEditorViewModel>());
         serviceLocator.AddTransient<DashboardViewModel>();
-        
+    }
+
+    // =========================================================================
+    // EVENTOS DO TRAY ICON
+    // =========================================================================
+
+    private void TrayIcon_OnClicked(object? sender, EventArgs e) => ShowApp();
+    private void MenuOpen_OnClick(object? sender, EventArgs e) => ShowApp();
+
+    private void MenuLock_OnClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is MainWindow window)
+        {
+            var vm = window.DataContext as MainViewModel;
+
+            // Caso o comando de bloqueio esteja no MainViewModel:
+            // vm?.LockVaultCommand?.Execute(null);
+        }
+    }
+
+    private void MenuExit_OnClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is MainWindow window)
+        {
+            window.ForceClose();
+        }
+    }
+
+    private void ShowApp()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        {
+            desktop.MainWindow.Show();
+
+            if (desktop.MainWindow.WindowState == WindowState.Minimized)
+            {
+                desktop.MainWindow.WindowState = WindowState.Normal;
+            }
+
+            desktop.MainWindow.Activate();
+        }
     }
 }

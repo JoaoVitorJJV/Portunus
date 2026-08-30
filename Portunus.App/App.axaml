@@ -11,13 +11,29 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://Portunus.App/Styles/Palette.axaml"/>
+        <ResourceInclude Source="avares://Portunus/Styles/Palette.axaml"/>
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>
-
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/Icons/export/portune-icon.ico" 
+                      ToolTipText="Portunus - Cofre Seguro"
+                      Clicked="TrayIcon_OnClicked">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Abrir Cofre" Click="MenuOpen_OnClick" />
+                        <!-- Como App.axaml não tem um ViewModel fácil, usamos um Click normal para o Bloqueio -->
+                        <NativeMenuItem Header="Bloquear Cofre" Click="MenuLock_OnClick" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Encerrar Portunus" Click="MenuExit_OnClick" />
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
   <Application.Styles>
     <FluentTheme/>
-    <StyleInclude Source="avares://Portunus.App/Styles/Controls.axaml"/>
+    <StyleInclude Source="avares://Portunus/Styles/Controls.axaml"/>
   </Application.Styles>
 </Application>

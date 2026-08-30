@@ -17,6 +17,7 @@
 	<Product>Portunus</Product>
 	<Company>PortunusSafe</Company>
 	<Description>Cofre de senhas local</Description>
+	<AssemblyName>Portunus</AssemblyName>
 </PropertyGroup>
   <ItemGroup>
     <Folder Include="Assets\Icons\" />

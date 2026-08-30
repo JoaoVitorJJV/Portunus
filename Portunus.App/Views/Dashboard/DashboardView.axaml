@@ -209,19 +209,29 @@
                     </ItemsControl>
                         
 
-                    <Grid Margin="11,16,0,6" ColumnDefinitions="*,Auto,Auto">
-                    <TextBlock Grid.Column="0" Classes="sec-label" Text="COFRES" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-  
-                    <!-- Botão de Importar -->
-                    <Button Grid.Column="1" Classes="sec-add" Margin="0,0,10,0" ToolTip.Tip="Importar arquivo" Command="{Binding ImportVaultCommand}">
-                    <i:Icon Value="fa-solid fa-file-import" FontSize="13"/>
-                    </Button>
-  
-                    <!-- Botão de Novo Cofre -->
-                    <Button Grid.Column="2" Classes="sec-add" ToolTip.Tip="Novo cofre" Command="{Binding NewVaultCommand}">
-                    <i:Icon Value="fa-solid fa-plus" FontSize="13"/>
-                    </Button>
-                </Grid>
+                   <Grid Margin="11,16,0,6" ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Classes="sec-label" Text="COFRES" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+    
+                        <!-- Agrupa todos os botões à direita com um espaçamento de 6px entre eles -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+        
+                            <!-- Botão de Exportar -->
+                            <Button Classes="sec-add" ToolTip.Tip="Exportar cofre (Backup)" Command="{Binding ExportVaultCommand}">
+                                <i:Icon Value="fa-solid fa-file-export" FontSize="13"/>
+                            </Button>
+
+                            <!-- Botão de Importar -->
+                            <Button Classes="sec-add" ToolTip.Tip="Importar arquivo" Command="{Binding ImportVaultCommand}">
+                                <i:Icon Value="fa-solid fa-file-import" FontSize="13"/>
+                            </Button>
+
+                            <!-- Botão de Novo Cofre -->
+                            <Button Classes="sec-add" ToolTip.Tip="Novo cofre" Command="{Binding NewVaultCommand}">
+                                <i:Icon Value="fa-solid fa-plus" FontSize="13"/>
+                            </Button>
+        
+                        </StackPanel>
+                    </Grid>
 
                     <ItemsControl ItemsSource="{Binding UserVaults}">
                             <ItemsControl.ItemTemplate>

@@ -93,6 +93,44 @@ public partial class DashboardViewModel(
     }
 
     #region Page Commands
+    [RelayCommand]
+    private async Task ExportVaultAsync()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow != null)
+        {
+            // 2. Pega o provedor de arquivos do Avalonia 11
+            var topLevel = Avalonia.Controls.TopLevel.GetTopLevel(desktop.MainWindow);
+            if (topLevel == null) return;
+
+            // 3. Configura a janela de "Salvar Como"
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Exportar Cofre de Senhas",
+                DefaultExtension = ".vault",
+                SuggestedFileName = "portunus_backup.vault",
+                FileTypeChoices = new[]
+                {
+                new FilePickerFileType("Cofre do Portunus") { Patterns = new[] { "*.vault" } }
+            }
+            });
+
+            if (file != null)
+            {
+                try
+                {
+                    string destinationPath = file.Path.LocalPath;
+
+                    _vaultService.ExportVault(destinationPath);
+
+                    _notifications.Success("Sucesso!", "Cofre exportado com segurança.");
+                }
+                catch (Exception ex)
+                {
+                    _notifications.Error("Ops!", "Não foi possível exportar o cofre.");
+                }
+            }
+        }
+    }
 
     [RelayCommand]
     private async Task SelectAllItems()

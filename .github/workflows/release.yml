@@ -20,7 +20,7 @@ env:
   VPK_VERSION: "1.2.0"
   PACK_ID:     "Portunus"
   APP_TITLE:   "Portunus"
-  MAIN_EXE:    "Portunus.App.exe"
+  MAIN_EXE:    "Portunus.exe"
   AUTHORS:     "PortunusCompany"
   APP_PROJ:    "Portunus.App/Portunus.App.csproj"
   ASSETS:      "Portunus.App/Assets"
